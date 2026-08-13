@@ -1838,7 +1838,7 @@ theorem gammaPatternBool_eq_true_iff
     (top left down : Erdos536.GridPoint) :
     GammaPatternBool top left down = true ↔
       Erdos536.GammaPattern top left down := by
-  simp [GammaPatternBool, Erdos536.GammaPattern]
+  simp [GammaPatternBool, Erdos536.GammaPattern, and_assoc]
 
 /--
 Executable check that a finite list is nodup and contains no Gamma-pattern.
@@ -1855,7 +1855,8 @@ theorem gammaFreeFiniteBool_eq_true_iff
     (S : List Erdos536.GridPoint) :
     GammaFreeFiniteBool S = true ↔ Erdos536.GammaFree S := by
   simp [GammaFreeFiniteBool, GammaPatternBool,
-    Erdos536.GammaFree, Erdos536.GammaPattern]
+    Erdos536.GammaFree, Erdos536.GammaPattern, and_assoc]
+  aesop
 
 /-- Soundness form convenient for computational certificates. -/
 theorem gammaFree_of_gammaFreeFiniteBool
