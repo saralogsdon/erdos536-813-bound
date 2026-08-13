@@ -13,14 +13,29 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python verify_finite.py
-      - run: python verify_two_layer_independent.py
+      - name: Exact finite verifier
+        run: python verify_finite.py
+      - name: Independent hypergraph verifier
+        run: python verify_two_layer_independent.py
 
   lean:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: leanprover/lean-action@v1
-        with:
-          build: true
-          test: false
+
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Show Lean versions
+        run: |
+          lean --version
+          lake --version
+
+      - name: Generate Lake manifest
+        run: lake update
+
+      - name: Build Lean project
+        run: lake build
