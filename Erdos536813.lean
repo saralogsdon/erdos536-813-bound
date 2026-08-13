@@ -2016,4 +2016,476 @@ theorem gammaFree_fiveAnnulus_120_deficit_three
   norm_num [L23, Nat.log]
   omega
 
+
+/-!
+## Remaining critical finite annulus states
+
+The annulus board changes only at finitely many critical values in
+`120 ≤ T ≤ 728`.  The `T = 120` state was certified above.  Here we
+kernel-check the remaining critical boards, always using the weaker uniform
+target `L23 T - 3`; some states in fact have a larger exact deficit.
+
+These are concrete exhaustive computations over all sublists of the finite
+annulus list.
+-/
+
+/-- Exhaustive finite annulus certificate at `T = 128`. -/
+theorem fiveAnnulus_128_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 128) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 128` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_128_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 128)) :
+    S.length + 3 ≤ L23 128 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_128_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 135`. -/
+theorem fiveAnnulus_135_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 135) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 135` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_135_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 135)) :
+    S.length + 3 ≤ L23 135 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_135_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 144`. -/
+theorem fiveAnnulus_144_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 144) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 144` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_144_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 144)) :
+    S.length + 3 ≤ L23 144 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_144_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 160`. -/
+theorem fiveAnnulus_160_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 160) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 160` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_160_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 160)) :
+    S.length + 3 ≤ L23 160 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_160_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 162`. -/
+theorem fiveAnnulus_162_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 162) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 162` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_162_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 162)) :
+    S.length + 3 ≤ L23 162 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_162_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 180`. -/
+theorem fiveAnnulus_180_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 180) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 180` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_180_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 180)) :
+    S.length + 3 ≤ L23 180 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_180_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 192`. -/
+theorem fiveAnnulus_192_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 192) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 192` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_192_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 192)) :
+    S.length + 3 ≤ L23 192 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_192_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 216`. -/
+theorem fiveAnnulus_216_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 216) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 216` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_216_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 216)) :
+    S.length + 3 ≤ L23 216 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_216_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 240`. -/
+theorem fiveAnnulus_240_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 240) 9 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 240` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_240_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 240)) :
+    S.length + 3 ≤ L23 240 := by
+  have hLen : S.length ≤ 9 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_240_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 243`. -/
+theorem fiveAnnulus_243_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 243) 10 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 243` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_243_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 243)) :
+    S.length + 3 ≤ L23 243 := by
+  have hLen : S.length ≤ 10 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_243_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 256`. -/
+theorem fiveAnnulus_256_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 256) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 256` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_256_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 256)) :
+    S.length + 3 ≤ L23 256 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_256_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 270`. -/
+theorem fiveAnnulus_270_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 270) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 270` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_270_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 270)) :
+    S.length + 3 ≤ L23 270 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_270_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 288`. -/
+theorem fiveAnnulus_288_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 288) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 288` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_288_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 288)) :
+    S.length + 3 ≤ L23 288 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_288_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 320`. -/
+theorem fiveAnnulus_320_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 320) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 320` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_320_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 320)) :
+    S.length + 3 ≤ L23 320 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_320_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 324`. -/
+theorem fiveAnnulus_324_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 324) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 324` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_324_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 324)) :
+    S.length + 3 ≤ L23 324 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_324_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 360`. -/
+theorem fiveAnnulus_360_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 360) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 360` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_360_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 360)) :
+    S.length + 3 ≤ L23 360 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_360_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 384`. -/
+theorem fiveAnnulus_384_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 384) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 384` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_384_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 384)) :
+    S.length + 3 ≤ L23 384 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_384_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 405`. -/
+theorem fiveAnnulus_405_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 405) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 405` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_405_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 405)) :
+    S.length + 3 ≤ L23 405 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_405_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 432`. -/
+theorem fiveAnnulus_432_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 432) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 432` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_432_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 432)) :
+    S.length + 3 ≤ L23 432 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_432_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 480`. -/
+theorem fiveAnnulus_480_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 480) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 480` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_480_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 480)) :
+    S.length + 3 ≤ L23 480 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_480_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 486`. -/
+theorem fiveAnnulus_486_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 486) 11 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 486` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_486_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 486)) :
+    S.length + 3 ≤ L23 486 := by
+  have hLen : S.length ≤ 11 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_486_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 512`. -/
+theorem fiveAnnulus_512_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 512) 12 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 512` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_512_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 512)) :
+    S.length + 3 ≤ L23 512 := by
+  have hLen : S.length ≤ 12 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_512_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 540`. -/
+theorem fiveAnnulus_540_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 540) 12 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 540` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_540_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 540)) :
+    S.length + 3 ≤ L23 540 := by
+  have hLen : S.length ≤ 12 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_540_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 576`. -/
+theorem fiveAnnulus_576_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 576) 12 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 576` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_576_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 576)) :
+    S.length + 3 ≤ L23 576 := by
+  have hLen : S.length ≤ 12 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_576_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 640`. -/
+theorem fiveAnnulus_640_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 640) 12 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 640` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_640_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 640)) :
+    S.length + 3 ≤ L23 640 := by
+  have hLen : S.length ≤ 12 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_640_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 648`. -/
+theorem fiveAnnulus_648_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 648) 12 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 648` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_648_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 648)) :
+    S.length + 3 ≤ L23 648 := by
+  have hLen : S.length ≤ 12 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_648_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
+/-- Exhaustive finite annulus certificate at `T = 720`. -/
+theorem fiveAnnulus_720_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 720) 12 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 720` annulus has deficit at least three. -/
+theorem gammaFree_fiveAnnulus_720_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 720)) :
+    S.length + 3 ≤ L23 720 := by
+  have hLen : S.length ≤ 12 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      fiveAnnulus_720_subset_bound_bool hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
 end Erdos536813
