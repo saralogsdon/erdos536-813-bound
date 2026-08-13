@@ -1,0 +1,21 @@
+name: Exact finite verification
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run exact finite verifier
+        run: python scripts/verify_finite.py
+      - name: Run independent full-hypergraph verifier
+        run: python scripts/verify_two_layer_independent.py

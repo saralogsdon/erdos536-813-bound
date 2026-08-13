@@ -1,0 +1,18 @@
+Checking annulus states...
+  annulus finite checks: PASS
+Checking exact two-layer stability states...
+  T= 45: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (69, 411, 3, 15)
+  T= 48: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (145, 791, 3, 15)
+  T= 54: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (327, 1594, 3, 15)
+  T= 60: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (327, 1594, 7, 31)
+  T= 64: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (327, 1921, 7, 31)
+  T= 80: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (559, 3161, 7, 38)
+  T= 81: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (559, 3720, 7, 38)
+  T= 90: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (559, 3720, 17, 81)
+  T= 96: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (1155, 7112, 17, 81)
+  T=108: PASS; (lower extremal, lower deficit-1, upper extremal, upper deficit-1) = (1987, 11796, 17, 81)
+Checking final rational arithmetic...
+  weighted deficit S = 61/800
+  final coefficient   = 813/1000 = 0.813000000000
+
+ALL EXACT FINITE CHECKS PASSED.

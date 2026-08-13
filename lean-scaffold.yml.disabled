@@ -1,0 +1,15 @@
+# Rename this file to lean.yml once the Lean formalization is ready to be CI-checked.
+name: Lean build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          nanoda: true
+          nanoda-allow-sorry: false

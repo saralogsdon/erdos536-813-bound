@@ -1,0 +1,6 @@
+name = "erdos536"
+version = "0.1.0"
+defaultTargets = ["Erdos536"]
+
+[[lean_lib]]
+name = "Erdos536"
