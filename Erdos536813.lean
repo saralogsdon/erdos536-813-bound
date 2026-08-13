@@ -927,4 +927,100 @@ theorem fiveAnnulus_same_i_j_le_add_one
     fiveAnnulus_same_i_forbids_j_gap_two hp hq hi
   omega
 
+
+/--
+Symmetric version of the same-column spacing bound: for two annulus points
+with the same 2-exponent, either 3-exponent is at most one above the other.
+-/
+theorem fiveAnnulus_same_i_j_le_other_add_one
+    {T : Nat}
+    {p q : Erdos536.GridPoint}
+    (hp : InFiveAnnulus T p)
+    (hq : InFiveAnnulus T q)
+    (hi : p.i = q.i) :
+    p.j ≤ q.j + 1 := by
+  by_cases hpq : p.j ≤ q.j
+  · omega
+  · have hqp : q.j ≤ p.j := by omega
+    exact fiveAnnulus_same_i_j_le_add_one hq hp hi.symm hqp
+
+/--
+Three points in the factor-5 annulus with the same 2-exponent cannot have
+three pairwise-distinct 3-exponents.
+
+Equivalently: each fixed 2-exponent supports at most two possible
+3-exponents in the annulus.
+-/
+theorem fiveAnnulus_same_i_three_j_not_pairwise_distinct
+    {T : Nat}
+    {p q r : Erdos536.GridPoint}
+    (hp : InFiveAnnulus T p)
+    (hq : InFiveAnnulus T q)
+    (hr : InFiveAnnulus T r)
+    (hpq_i : p.i = q.i)
+    (hpr_i : p.i = r.i) :
+    ¬ (p.j ≠ q.j ∧ p.j ≠ r.j ∧ q.j ≠ r.j) := by
+  intro hDistinct
+  rcases hDistinct with ⟨hpq_ne, hpr_ne, hqr_ne⟩
+
+  have hpq :
+      p.j ≤ q.j + 1 :=
+    fiveAnnulus_same_i_j_le_other_add_one hp hq hpq_i
+  have hqp :
+      q.j ≤ p.j + 1 :=
+    fiveAnnulus_same_i_j_le_other_add_one hq hp hpq_i.symm
+
+  have hpr :
+      p.j ≤ r.j + 1 :=
+    fiveAnnulus_same_i_j_le_other_add_one hp hr hpr_i
+  have hrp :
+      r.j ≤ p.j + 1 :=
+    fiveAnnulus_same_i_j_le_other_add_one hr hp hpr_i.symm
+
+  have hqr_i : q.i = r.i := hpq_i.symm.trans hpr_i
+  have hqr :
+      q.j ≤ r.j + 1 :=
+    fiveAnnulus_same_i_j_le_other_add_one hq hr hqr_i
+  have hrq :
+      r.j ≤ q.j + 1 :=
+    fiveAnnulus_same_i_j_le_other_add_one hr hq hqr_i.symm
+
+  omega
+
+/--
+Point version: three annulus points with the same 2-exponent cannot all be
+pairwise distinct.
+-/
+theorem fiveAnnulus_same_i_three_points_not_pairwise_distinct
+    {T : Nat}
+    {p q r : Erdos536.GridPoint}
+    (hp : InFiveAnnulus T p)
+    (hq : InFiveAnnulus T q)
+    (hr : InFiveAnnulus T r)
+    (hpq_i : p.i = q.i)
+    (hpr_i : p.i = r.i) :
+    ¬ (p ≠ q ∧ p ≠ r ∧ q ≠ r) := by
+  intro hDistinct
+  rcases hDistinct with ⟨hpq_ne, hpr_ne, hqr_ne⟩
+  apply fiveAnnulus_same_i_three_j_not_pairwise_distinct
+    hp hq hr hpq_i hpr_i
+  constructor
+  · intro hpq_j
+    apply hpq_ne
+    cases p
+    cases q
+    simp_all
+  constructor
+  · intro hpr_j
+    apply hpr_ne
+    cases p
+    cases r
+    simp_all
+  · intro hqr_j
+    apply hqr_ne
+    have hqr_i : q.i = r.i := hpq_i.symm.trans hpr_i
+    cases q
+    cases r
+    simp_all
+
 end Erdos536813
