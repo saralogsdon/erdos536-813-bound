@@ -14,7 +14,6 @@ This improves the currently recorded coefficient $`5/6\approx0.833333`$ to $`0.8
 - The infinite/combinatorial part has a hand proof.
 - The delicate finite two-layer lemma is checked by **two independent exact Python programs** using integer arithmetic only.
 - The Lean formalization in `Erdos536/` is currently a scaffold: it formalizes definitions and exact arithmetic consequences, but does **not yet formalize the finite stability computation**.
-- No claim of final publication-level verification is made yet.
 
 ## Reproduce the exact finite checks
 
