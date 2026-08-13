@@ -199,4 +199,64 @@ theorem maximalGammaFree_add_creates_gamma
   · exact Or.inr (Or.inr hdownc)
   · exact False.elim ((hNoGammaS top htopS left hleftS down hdownS) hGamma)
 
+
+/--
+A missing point in a maximal Gamma-free family creates a Gamma-pattern with
+two genuinely old vertices from `S`.  We record the three possible roles of
+the new point `c`.
+-/
+theorem maximalGammaFree_missing_point_has_old_pair
+    {D S : List Erdos536.GridPoint}
+    {c : Erdos536.GridPoint}
+    (hMax : MaximalGammaFreeIn D S)
+    (hcD : c ∈ D)
+    (hcS : c ∉ S) :
+    ∃ u v : Erdos536.GridPoint,
+      u ∈ S ∧
+      v ∈ S ∧
+      (Erdos536.GammaPattern c u v ∨
+        Erdos536.GammaPattern u c v ∨
+        Erdos536.GammaPattern u v c) := by
+  rcases maximalGammaFree_add_creates_gamma hMax hcD hcS with
+    ⟨top, left, down, htop, hleft, hdown, hGamma, hcRole⟩
+  have hDistinct := Erdos536.gamma_points_pairwise_distinct hGamma
+  rcases hDistinct with ⟨hTopLeft, hTopDown, hLeftDown⟩
+  rcases hcRole with htopc | hleftc | hdownc
+  · have hleftS : left ∈ S := by
+      rcases List.mem_cons.mp hleft with hleftc' | hleftS
+      · exfalso
+        exact hTopLeft (htopc.trans hleftc'.symm)
+      · exact hleftS
+    have hdownS : down ∈ S := by
+      rcases List.mem_cons.mp hdown with hdownc' | hdownS
+      · exfalso
+        exact hTopDown (htopc.trans hdownc'.symm)
+      · exact hdownS
+    refine ⟨left, down, hleftS, hdownS, Or.inl ?_⟩
+    simpa [htopc] using hGamma
+  · have htopS : top ∈ S := by
+      rcases List.mem_cons.mp htop with htopc' | htopS
+      · exfalso
+        exact hTopLeft (htopc'.trans hleftc.symm)
+      · exact htopS
+    have hdownS : down ∈ S := by
+      rcases List.mem_cons.mp hdown with hdownc' | hdownS
+      · exfalso
+        exact hLeftDown (hleftc.trans hdownc'.symm)
+      · exact hdownS
+    refine ⟨top, down, htopS, hdownS, Or.inr (Or.inl ?_)⟩
+    simpa [hleftc] using hGamma
+  · have htopS : top ∈ S := by
+      rcases List.mem_cons.mp htop with htopc' | htopS
+      · exfalso
+        exact hTopDown (htopc'.trans hdownc.symm)
+      · exact htopS
+    have hleftS : left ∈ S := by
+      rcases List.mem_cons.mp hleft with hleftc' | hleftS
+      · exfalso
+        exact hLeftDown (hleftc'.trans hdownc.symm)
+      · exact hleftS
+    refine ⟨top, left, htopS, hleftS, Or.inr (Or.inr ?_)⟩
+    simpa [hdownc] using hGamma
+
 end Erdos536813
