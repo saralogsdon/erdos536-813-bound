@@ -612,4 +612,149 @@ theorem maximalGammaFree_blocks_every_nontrivial_lower_point
   · exact maximalGammaFree_excludes_lower_fiberValue
       hq hMax hcD hcS hA hUpperSelected
 
+
+/--
+A maximum-cardinality Gamma-free family inside `D`.
+-/
+def MaximumGammaFreeIn
+    (D S : List Erdos536.GridPoint) : Prop :=
+  Erdos536.GammaFree S ∧
+    S.Subset D ∧
+    ∀ T : List Erdos536.GridPoint,
+      Erdos536.GammaFree T →
+      T.Subset D →
+      T.length ≤ S.length
+
+/-- The origin can never be the top vertex of a Gamma-pattern. -/
+theorem no_gamma_with_origin_as_top
+    {left down : Erdos536.GridPoint} :
+    ¬ Erdos536.GammaPattern gridOrigin left down := by
+  intro h
+  rcases h with ⟨_hRow, hLeftLt, _hCol, _hDownLt⟩
+  simp [gridOrigin] at hLeftLt
+
+/-- The origin can never be the left vertex of a Gamma-pattern. -/
+theorem no_gamma_with_origin_as_left
+    {top down : Erdos536.GridPoint} :
+    ¬ Erdos536.GammaPattern top gridOrigin down := by
+  intro h
+  rcases h with ⟨hRow, _hLeftLt, _hCol, hDownLt⟩
+  have hTopJ : top.j = 0 := by
+    simpa [gridOrigin] using hRow.symm
+  rw [hTopJ] at hDownLt
+  omega
+
+/-- The origin can never be the down vertex of a Gamma-pattern. -/
+theorem no_gamma_with_origin_as_down
+    {top left : Erdos536.GridPoint} :
+    ¬ Erdos536.GammaPattern top left gridOrigin := by
+  intro h
+  rcases h with ⟨_hRow, hLeftLt, hCol, _hDownLt⟩
+  have hTopI : top.i = 0 := by
+    simpa [gridOrigin] using hCol.symm
+  rw [hTopI] at hLeftLt
+  omega
+
+/--
+Adjoining the origin to a Gamma-free family remains Gamma-free.
+-/
+theorem gammaFree_cons_origin
+    {S : List Erdos536.GridPoint}
+    (hGF : Erdos536.GammaFree S)
+    (hOriginNot : gridOrigin ∉ S) :
+    Erdos536.GammaFree (gridOrigin :: S) := by
+  constructor
+  · exact List.nodup_cons.mpr ⟨hOriginNot, hGF.1⟩
+  · intro top hTop left hLeft down hDown hGamma
+    rcases List.mem_cons.mp hTop with hTop0 | hTopS
+    · subst top
+      exact no_gamma_with_origin_as_top hGamma
+    rcases List.mem_cons.mp hLeft with hLeft0 | hLeftS
+    · subst left
+      exact no_gamma_with_origin_as_left hGamma
+    rcases List.mem_cons.mp hDown with hDown0 | hDownS
+    · subst down
+      exact no_gamma_with_origin_as_down hGamma
+    · exact hGF.2 top hTopS left hLeftS down hDownS hGamma
+
+/--
+A maximum-cardinality Gamma-free family is inclusion-maximal.
+-/
+theorem maximumGammaFree_is_maximal
+    {D S : List Erdos536.GridPoint}
+    (hMaximum : MaximumGammaFreeIn D S) :
+    MaximalGammaFreeIn D S := by
+  rcases hMaximum with ⟨hGF, hSubset, hCard⟩
+  refine ⟨hGF, ?_⟩
+  intro c hcD hcS
+  intro hGFcons
+  have hSubsetCons : (c :: S).Subset D := by
+    intro x hx
+    rcases List.mem_cons.mp hx with rfl | hxS
+    · exact hcD
+    · exact hSubset hxS
+  have hLen := hCard (c :: S) hGFcons hSubsetCons
+  simp at hLen
+
+/--
+If the ambient board contains the origin, then every maximum-cardinality
+Gamma-free family contains the origin.
+-/
+theorem maximumGammaFree_contains_origin
+    {D S : List Erdos536.GridPoint}
+    (hOriginD : gridOrigin ∈ D)
+    (hMaximum : MaximumGammaFreeIn D S) :
+    gridOrigin ∈ S := by
+  rcases hMaximum with ⟨hGF, hSubset, hCard⟩
+  by_contra hOriginS
+  have hGFcons : Erdos536.GammaFree (gridOrigin :: S) :=
+    gammaFree_cons_origin hGF hOriginS
+  have hSubsetCons : (gridOrigin :: S).Subset D := by
+    intro x hx
+    rcases List.mem_cons.mp hx with rfl | hxS
+    · exact hOriginD
+    · exact hSubset hxS
+  have hLen := hCard (gridOrigin :: S) hGFcons hSubsetCons
+  simp at hLen
+
+/--
+For a maximum-cardinality Gamma-free upper slice, the two structural
+hypotheses needed by the pointwise blocking theorem are automatic.
+-/
+theorem maximumGammaFree_origin_and_maximal
+    {D S : List Erdos536.GridPoint}
+    (hOriginD : gridOrigin ∈ D)
+    (hMaximum : MaximumGammaFreeIn D S) :
+    gridOrigin ∈ S ∧ MaximalGammaFreeIn D S := by
+  exact ⟨
+    maximumGammaFree_contains_origin hOriginD hMaximum,
+    maximumGammaFree_is_maximal hMaximum
+  ⟩
+
+/--
+Blocking theorem with the natural extremality hypothesis.
+
+If the selected upper `5*q` slice is maximum-cardinality Gamma-free inside
+`D`, and `D` contains the origin, then every nontrivial point of `D` is
+forbidden in the adjacent lower `q` slice.
+-/
+theorem maximumGammaFree_blocks_every_nontrivial_lower_point
+    {D S : List Erdos536.GridPoint}
+    {A : List Nat}
+    {c : Erdos536.GridPoint}
+    {q N : Nat}
+    (hq : 0 < q)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete S A (5 * q))
+    (hOriginD : gridOrigin ∈ D)
+    (hMaximum : MaximumGammaFreeIn D S)
+    (hcD : c ∈ D)
+    (hcNontrivial : Erdos536.fiberValue 1 c ≠ 1) :
+    Erdos536.fiberValue q c ∉ A := by
+  rcases maximumGammaFree_origin_and_maximal hOriginD hMaximum with
+    ⟨hOriginS, hMaximal⟩
+  exact maximalGammaFree_blocks_every_nontrivial_lower_point
+    hq hA hMaximal hUpperSelected hOriginS hcD hcNontrivial
+
 end Erdos536813
