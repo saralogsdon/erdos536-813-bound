@@ -1416,12 +1416,16 @@ lemma then bounds the extra points by `ceil(J/2)`.
 -/
 
 /-- Selected points with no selected point below them in the same column. -/
-def BaseAnnulusPoints (S : List Erdos536.GridPoint) : List Erdos536.GridPoint :=
-  S.filter (fun p => decide (¬ Erdos536.HasColDown S p))
+noncomputable def BaseAnnulusPoints
+    (S : List Erdos536.GridPoint) : List Erdos536.GridPoint := by
+  classical
+  exact S.filter (fun p => decide (¬ Erdos536.HasColDown S p))
 
 /-- Selected points with a selected point below them in the same column. -/
-def ExtraAnnulusPoints (S : List Erdos536.GridPoint) : List Erdos536.GridPoint :=
-  S.filter (fun p => decide (Erdos536.HasColDown S p))
+noncomputable def ExtraAnnulusPoints
+    (S : List Erdos536.GridPoint) : List Erdos536.GridPoint := by
+  classical
+  exact S.filter (fun p => decide (Erdos536.HasColDown S p))
 
 /-- A list splits in length according to a decidable predicate and its negation. -/
 theorem filter_prop_partition_length
@@ -1435,13 +1439,16 @@ theorem filter_prop_partition_length
   | nil => simp
   | cons a l ih =>
       by_cases ha : P a
-      · simp [ha, ih]
-      · simp [ha, ih]
+      · simp [ha] at ih ⊢
+        omega
+      · simp [ha] at ih ⊢
+        omega
 
 /-- The base/extra split preserves total cardinality. -/
 theorem base_extra_length_eq
     (S : List Erdos536.GridPoint) :
     (BaseAnnulusPoints S).length + (ExtraAnnulusPoints S).length = S.length := by
+  classical
   have h := filter_prop_partition_length S (fun p => Erdos536.HasColDown S p)
   simpa [BaseAnnulusPoints, ExtraAnnulusPoints, Nat.add_comm] using h
 
@@ -1474,6 +1481,7 @@ theorem base_i_injective_on
     (hq : q ∈ BaseAnnulusPoints S)
     (hi : p.i = q.i) :
     p = q := by
+  classical
   rcases List.mem_filter.mp hp with ⟨hpS, hpBase⟩
   rcases List.mem_filter.mp hq with ⟨hqS, hqBase⟩
   exact base_points_same_i_eq hpS hqS (by simpa using hpBase) (by simpa using hqBase) hi
@@ -1483,6 +1491,7 @@ theorem base_i_map_nodup
     {S : List Erdos536.GridPoint}
     (hSNodup : S.Nodup) :
     ((BaseAnnulusPoints S).map (fun p => p.i)).Nodup := by
+  classical
   have hBaseNodup : (BaseAnnulusPoints S).Nodup := by
     exact hSNodup.filter (fun p => decide (¬ Erdos536.HasColDown S p))
   exact hBaseNodup.map_on (fun p hp q hq hi => base_i_injective_on hp hq hi)
@@ -1499,7 +1508,8 @@ theorem nodup_nat_list_length_le_of_forall_lt
     have hnL : n ∈ l := by simpa using hn
     simpa using hBound n hnL
   have hCard := Finset.card_le_card hSub
-  simpa [hNodup] using hCard
+  rw [List.toFinset_card_of_nodup hNodup] at hCard
+  simpa using hCard
 
 /-- Base points contribute at most one point for each `i = 0,...,I`. -/
 theorem baseAnnulusPoints_length_le
@@ -1508,12 +1518,14 @@ theorem baseAnnulusPoints_length_le
     (hSNodup : S.Nodup)
     (hIBound : ∀ p ∈ S, p.i ≤ I) :
     (BaseAnnulusPoints S).length ≤ I + 1 := by
+  classical
   have hNodup := base_i_map_nodup hSNodup
   have hBound :
       ∀ i ∈ (BaseAnnulusPoints S).map (fun p => p.i), i < I + 1 := by
     intro i hi
     rcases List.mem_map.mp hi with ⟨p, hpBase, rfl⟩
     have hpS : p ∈ S := (List.mem_filter.mp hpBase).1
+    have hpI : p.i ≤ I := hIBound p hpS
     omega
   have h := nodup_nat_list_length_le_of_forall_lt hNodup hBound
   simpa using h
@@ -1526,6 +1538,7 @@ theorem extra_point_is_double_top
     (hSAnn : ∀ x ∈ S, InFiveAnnulus T x)
     (hpExtra : p ∈ ExtraAnnulusPoints S) :
     ∃ down, IsSelectedAnnulusDoubleColumn T S p down := by
+  classical
   rcases List.mem_filter.mp hpExtra with ⟨hpS, hpCol⟩
   have hpCol' : Erdos536.HasColDown S p := by simpa using hpCol
   rcases hpCol' with ⟨down, hdownS, hSameI, hDownLt⟩
@@ -1573,7 +1586,7 @@ theorem extra_points_same_i_eq
       · intro h; subst qDown; omega
       constructor
       · intro h; subst qDown; omega
-      · exact hpq.symm
+      · exact fun h => hpq h.symm
     have hqDownAnn := hQ.2.2.2.1
     have hqAnn := hQ.2.2.1
     have hpAnn := hP.2.2.1
@@ -1621,6 +1634,7 @@ theorem extra_halfIndex_map_nodup
     (hGamma : Erdos536.GammaFree S)
     (hSAnn : ∀ x ∈ S, InFiveAnnulus T x) :
     ((ExtraAnnulusPoints S).map (fun p => halfIndex p.j)).Nodup := by
+  classical
   have hExtraNodup : (ExtraAnnulusPoints S).Nodup := by
     exact hGamma.1.filter (fun p => decide (Erdos536.HasColDown S p))
   apply hExtraNodup.map_on
@@ -1641,6 +1655,7 @@ theorem extraAnnulusPoints_length_le_ceiling_half
     (hSAnn : ∀ x ∈ S, InFiveAnnulus T x)
     (hJBound : ∀ p ∈ S, p.j ≤ J) :
     (ExtraAnnulusPoints S).length ≤ (J + 1) / 2 := by
+  classical
   have hNodup := extra_halfIndex_map_nodup hGamma hSAnn
   have hBound :
       ∀ n ∈ (ExtraAnnulusPoints S).map (fun p => halfIndex p.j),
