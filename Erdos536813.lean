@@ -421,4 +421,63 @@ theorem maximalGammaFree_blocks_across_five
       · exact h5c
     exact scale_is_lcmTriangle hq hCross
 
+
+/--
+If the upper-layer points of a maximal Gamma-free family are all selected in
+the global LCM-triangle-free set `A`, then a missing board point cannot also
+be selected in the adjacent lower 5-adic layer.
+-/
+theorem maximalGammaFree_excludes_lower_selected
+    {D S : List Erdos536.GridPoint}
+    {A : List Nat}
+    {c : Erdos536.GridPoint}
+    {q N : Nat}
+    (hq : 0 < q)
+    (hMax : MaximalGammaFreeIn D S)
+    (hcD : c ∈ D)
+    (hcS : c ∉ S)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hUpper :
+      ∀ p ∈ S,
+        q * (5 * Erdos536.fiberValue 1 p) ∈ A) :
+    q * Erdos536.fiberValue 1 c ∉ A := by
+  intro hcA
+  rcases maximalGammaFree_blocks_across_five hq hMax hcD hcS with
+    ⟨u, v, huS, hvS, hTri⟩
+  exact hA.2.2
+    (q * (5 * Erdos536.fiberValue 1 u)) (hUpper u huS)
+    (q * (5 * Erdos536.fiberValue 1 v)) (hUpper v hvS)
+    (q * Erdos536.fiberValue 1 c) hcA
+    hTri
+
+/--
+Same blocking statement in Kenta's native `FiberSelectedComplete` language.
+
+If `S` is exactly the selected part of the upper fiber with base `5*q`,
+and `S` is maximal Gamma-free in `D`, then every missing point `c ∈ D \ S`
+is absent from the adjacent lower fiber with base `q`.
+-/
+theorem maximalGammaFree_excludes_lower_fiberValue
+    {D S : List Erdos536.GridPoint}
+    {A : List Nat}
+    {c : Erdos536.GridPoint}
+    {q N : Nat}
+    (hq : 0 < q)
+    (hMax : MaximalGammaFreeIn D S)
+    (hcD : c ∈ D)
+    (hcS : c ∉ S)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete S A (5 * q)) :
+    Erdos536.fiberValue q c ∉ A := by
+  have hBlock :
+      q * Erdos536.fiberValue 1 c ∉ A := by
+    apply maximalGammaFree_excludes_lower_selected
+      hq hMax hcD hcS hA
+    intro p hpS
+    have hpA : Erdos536.fiberValue (5 * q) p ∈ A :=
+      (hUpperSelected.2 p).1 hpS
+    simpa [Erdos536.fiberValue, Nat.mul_assoc, Nat.mul_comm, Nat.mul_left_comm] using hpA
+  simpa [Erdos536.fiberValue, Nat.mul_assoc] using hBlock
+
 end Erdos536813
