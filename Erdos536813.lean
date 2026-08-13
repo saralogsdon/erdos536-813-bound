@@ -1905,4 +1905,80 @@ example :
        ({ i := 1, j := 0 } : Erdos536.GridPoint)] = false := by
   native_decide
 
+
+/-!
+## Sound finite subset-bound certificates
+
+A finite Boolean certificate checks every sublist of a finite ambient list.
+For a mathematical Gamma-free set represented by any nodup list `S ⊆ D`,
+`S.Nodup` gives a sub-permutation into `D`; hence `S` is permutation-equivalent
+to an actual sublist of `D`. Since Gamma-freeness is invariant under
+permutation, checking all sublists is sufficient.
+-/
+
+/-- Gamma-freeness depends only on the underlying finite set, not list order. -/
+theorem gammaFree_of_perm
+    {S U : List Erdos536.GridPoint}
+    (hPerm : U ~ S)
+    (hS : Erdos536.GammaFree S) :
+    Erdos536.GammaFree U := by
+  constructor
+  · exact hPerm.nodup_iff.mpr hS.1
+  · intro top hTop left hLeft down hDown hPat
+    have hTopS : top ∈ S := hPerm.mem_iff.mp hTop
+    have hLeftS : left ∈ S := hPerm.mem_iff.mp hLeft
+    have hDownS : down ∈ S := hPerm.mem_iff.mp hDown
+    exact hS.2 top hTopS left hLeftS down hDownS hPat
+
+/--
+Boolean certificate asserting that every Gamma-free sublist of `D`
+has length at most `B`.
+-/
+def GammaFreeSubsetBoundBool
+    (D : List Erdos536.GridPoint)
+    (B : Nat) : Bool :=
+  D.sublists.all (fun U =>
+    (! GammaFreeFiniteBool U) || decide (U.length ≤ B))
+
+/--
+Soundness of the exhaustive finite certificate.
+
+This bridges a `native_decide` computation over all sublists to every
+mathematical Gamma-free nodup subset, regardless of list ordering.
+-/
+theorem gammaFree_length_le_of_subsetBoundBool
+    {D S : List Erdos536.GridPoint}
+    {B : Nat}
+    (hCert : GammaFreeSubsetBoundBool D B = true)
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset D) :
+    S.length ≤ B := by
+  have hSubperm : S <+~ D :=
+    hGamma.1.subperm hSub
+  rcases hSubperm with ⟨U, hPerm, hUSub⟩
+  have hUMem : U ∈ D.sublists := by
+    exact List.mem_sublists.mpr hUSub
+  have hUGamma : Erdos536.GammaFree U :=
+    gammaFree_of_perm hPerm hGamma
+  have hUBool : GammaFreeFiniteBool U = true :=
+    gammaFreeFiniteBool_of_gammaFree hUGamma
+  have hAll :
+      ∀ V ∈ D.sublists,
+        ((! GammaFreeFiniteBool V) || decide (V.length ≤ B)) = true := by
+    simpa [GammaFreeSubsetBoundBool] using hCert
+  have hUCheck := hAll U hUMem
+  rw [hUBool] at hUCheck
+  have hULe : U.length ≤ B := by
+    simpa using hUCheck
+  simpa [hPerm.length_eq] using hULe
+
+/-- Tiny sanity check for the finite certificate mechanism. -/
+example :
+    GammaFreeSubsetBoundBool
+      [({ i := 1, j := 1 } : Erdos536.GridPoint),
+       ({ i := 0, j := 1 } : Erdos536.GridPoint),
+       ({ i := 1, j := 0 } : Erdos536.GridPoint)]
+      2 = true := by
+  native_decide
+
 end Erdos536813
