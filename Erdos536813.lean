@@ -3057,7 +3057,7 @@ theorem isLcmTriangleBool_eq_true_iff
     (a b c : Nat) :
     IsLcmTriangleBool a b c = true ↔
       Erdos536.IsLcmTriangle a b c := by
-  simp [IsLcmTriangleBool, Erdos536.IsLcmTriangle]
+  simp [IsLcmTriangleBool, Erdos536.IsLcmTriangle, and_assoc]
 
 /-- Executable two-layer triangle-freeness checker. -/
 def TwoLayerTriangleFreeBool
@@ -3073,7 +3073,7 @@ theorem twoLayerTriangleFreeBool_eq_true_iff
     TwoLayerTriangleFreeBool Lower Upper = true ↔
       TwoLayerTriangleFree Lower Upper := by
   simp [TwoLayerTriangleFreeBool, TwoLayerTriangleFree,
-    IsLcmTriangleBool]
+    isLcmTriangleBool_eq_true_iff]
 
 /-- Triangle-freeness depends only on the underlying multisets of values. -/
 theorem triangleFreeValues_of_perm
