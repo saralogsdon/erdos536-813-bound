@@ -139,4 +139,64 @@ theorem lift_two_by_five_is_lcmTriangle_of_triangle
   · exact h5w
   · exact h5c
 
+
+/--
+`S` is inclusion-maximal Gamma-free inside the ambient board `D`.
+
+This is deliberately an inclusion-maximal notion.  Later we will show that
+a maximum-cardinality Gamma-free slice is automatically maximal in this sense.
+-/
+def MaximalGammaFreeIn
+    (D S : List Erdos536.GridPoint) : Prop :=
+  Erdos536.GammaFree S ∧
+    ∀ c ∈ D, c ∉ S → ¬ Erdos536.GammaFree (c :: S)
+
+/--
+If `S` is maximal Gamma-free in `D` and `c ∈ D \ S`, then adjoining `c`
+creates a Gamma-pattern, and that Gamma-pattern must involve the new point `c`.
+-/
+theorem maximalGammaFree_add_creates_gamma
+    {D S : List Erdos536.GridPoint}
+    {c : Erdos536.GridPoint}
+    (hMax : MaximalGammaFreeIn D S)
+    (hcD : c ∈ D)
+    (hcS : c ∉ S) :
+    ∃ top left down : Erdos536.GridPoint,
+      top ∈ c :: S ∧
+      left ∈ c :: S ∧
+      down ∈ c :: S ∧
+      Erdos536.GammaPattern top left down ∧
+      (top = c ∨ left = c ∨ down = c) := by
+  rcases hMax with ⟨hGF, hMaximal⟩
+  have hGF' :
+      S.Nodup ∧
+        ∀ top ∈ S, ∀ left ∈ S, ∀ down ∈ S,
+          ¬ Erdos536.GammaPattern top left down := by
+    simpa [Erdos536.GammaFree] using hGF
+  rcases hGF' with ⟨hSNodup, hNoGammaS⟩
+  have hNotGF : ¬ Erdos536.GammaFree (c :: S) :=
+    hMaximal c hcD hcS
+  have hConsNodup : (c :: S).Nodup := by
+    exact List.nodup_cons.mpr ⟨hcS, hSNodup⟩
+  have hExists :
+      ∃ top ∈ c :: S, ∃ left ∈ c :: S, ∃ down ∈ c :: S,
+        Erdos536.GammaPattern top left down := by
+    by_contra hNoExists
+    apply hNotGF
+    constructor
+    · exact hConsNodup
+    · intro top htop left hleft down hdown hGamma
+      apply hNoExists
+      exact ⟨top, htop, left, hleft, down, hdown, hGamma⟩
+  rcases hExists with
+    ⟨top, htop, left, hleft, down, hdown, hGamma⟩
+  refine ⟨top, left, down, htop, hleft, hdown, hGamma, ?_⟩
+  rcases List.mem_cons.mp htop with htopc | htopS
+  · exact Or.inl htopc
+  rcases List.mem_cons.mp hleft with hleftc | hleftS
+  · exact Or.inr (Or.inl hleftc)
+  rcases List.mem_cons.mp hdown with hdownc | hdownS
+  · exact Or.inr (Or.inr hdownc)
+  · exact False.elim ((hNoGammaS top htopS left hleftS down hdownS) hGamma)
+
 end Erdos536813
