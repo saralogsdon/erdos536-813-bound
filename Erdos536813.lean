@@ -480,4 +480,136 @@ theorem maximalGammaFree_excludes_lower_fiberValue
     simpa [Erdos536.fiberValue, Nat.mul_assoc, Nat.mul_comm, Nat.mul_left_comm] using hpA
   simpa [Erdos536.fiberValue, Nat.mul_assoc] using hBlock
 
+
+/-- The origin of the 2,3-exponent grid. -/
+def gridOrigin : Erdos536.GridPoint := { i := 0, j := 0 }
+
+/--
+For every positive `d ≠ 1` that is coprime to 5, the three numbers
+`5`, `5*d`, and `d` form an LCM triangle.
+-/
+theorem five_five_mul_lower_is_lcmTriangle
+    {d : Nat}
+    (hd : 0 < d)
+    (hd1 : d ≠ 1)
+    (h5d : Nat.Coprime 5 d) :
+    Erdos536.IsLcmTriangle 5 (5 * d) d := by
+  have hAB : Nat.lcm 5 (5 * d) = 5 * d := by
+    calc
+      Nat.lcm 5 (5 * d) = Nat.lcm (5 * 1) (5 * d) := by simp
+      _ = 5 * Nat.lcm 1 d := by rw [Nat.lcm_mul_left]
+      _ = 5 * d := by simp
+  have hAC : Nat.lcm 5 d = 5 * d := by
+    have h := lcm_five_mul_of_lcm_eq
+      (a := 1) (c := d) (w := d) (by simp) h5d
+    simpa using h
+  have hBC : Nat.lcm (5 * d) d = 5 * d := by
+    exact Nat.lcm_eq_left (Nat.dvd_mul_left d 5)
+
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · intro hEq
+    have hEq' : 5 * 1 = 5 * d := by simpa using hEq
+    have h1d : 1 = d := Nat.mul_left_cancel (by decide : 0 < (5 : Nat)) hEq'
+    exact hd1 h1d.symm
+  · intro hEq
+    have h5dvd : 5 ∣ d := by
+      rw [← hEq]
+    have h51 : 5 = 1 := h5d.eq_one_of_dvd h5dvd
+    exact (by decide : (5 : Nat) ≠ 1) h51
+  · intro hEq
+    have hEq' : 5 * d = 1 * d := by simpa using hEq
+    have h51 : 5 = 1 := Nat.mul_right_cancel hd hEq'
+    exact (by decide : (5 : Nat) ≠ 1) h51
+  · exact hAB.trans hAC.symm
+  · exact hAC.trans hBC.symm
+
+/--
+If the origin and a nontrivial point `c` are both selected in an upper
+`5*q` fiber, then the corresponding lower `q`-fiber value at `c` is forbidden.
+This is the `c ∈ S` half of the blocking dichotomy.
+-/
+theorem selected_upper_point_excludes_same_lower
+    {S : List Erdos536.GridPoint}
+    {A : List Nat}
+    {c : Erdos536.GridPoint}
+    {q N : Nat}
+    (hq : 0 < q)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete S A (5 * q))
+    (hOriginS : gridOrigin ∈ S)
+    (hcS : c ∈ S)
+    (hcNontrivial : Erdos536.fiberValue 1 c ≠ 1) :
+    Erdos536.fiberValue q c ∉ A := by
+  intro hcLowerA
+
+  have hOriginA : Erdos536.fiberValue (5 * q) gridOrigin ∈ A :=
+    (hUpperSelected.2 gridOrigin).1 hOriginS
+  have hcUpperA : Erdos536.fiberValue (5 * q) c ∈ A :=
+    (hUpperSelected.2 c).1 hcS
+
+  have hdpos : 0 < Erdos536.fiberValue 1 c := by
+    simp [Erdos536.fiberValue]
+  have h5d : Nat.Coprime 5 (Erdos536.fiberValue 1 c) :=
+    coprime_five_fiberValue (m := 1) (by decide) c
+
+  have hBaseTri :
+      Erdos536.IsLcmTriangle
+        5
+        (5 * Erdos536.fiberValue 1 c)
+        (Erdos536.fiberValue 1 c) :=
+    five_five_mul_lower_is_lcmTriangle hdpos hcNontrivial h5d
+
+  have hScaledTri :
+      Erdos536.IsLcmTriangle
+        (q * 5)
+        (q * (5 * Erdos536.fiberValue 1 c))
+        (q * Erdos536.fiberValue 1 c) :=
+    scale_is_lcmTriangle hq hBaseTri
+
+  have hTri :
+      Erdos536.IsLcmTriangle
+        (Erdos536.fiberValue (5 * q) gridOrigin)
+        (Erdos536.fiberValue (5 * q) c)
+        (Erdos536.fiberValue q c) := by
+    simpa [gridOrigin, Erdos536.fiberValue, Nat.mul_assoc,
+      Nat.mul_comm, Nat.mul_left_comm] using hScaledTri
+
+  exact hA.2.2
+    (Erdos536.fiberValue (5 * q) gridOrigin) hOriginA
+    (Erdos536.fiberValue (5 * q) c) hcUpperA
+    (Erdos536.fiberValue q c) hcLowerA
+    hTri
+
+/--
+Pointwise blocking dichotomy for an adjacent pair of 5-adic layers.
+
+Assume:
+* `S` is exactly the selected upper `5*q` fiber,
+* `S` is maximal Gamma-free in `D`,
+* the origin is selected.
+
+Then every nontrivial point `c ∈ D` is absent from the lower `q` fiber,
+whether `c` belongs to the upper slice or not.
+-/
+theorem maximalGammaFree_blocks_every_nontrivial_lower_point
+    {D S : List Erdos536.GridPoint}
+    {A : List Nat}
+    {c : Erdos536.GridPoint}
+    {q N : Nat}
+    (hq : 0 < q)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hMax : MaximalGammaFreeIn D S)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete S A (5 * q))
+    (hOriginS : gridOrigin ∈ S)
+    (hcD : c ∈ D)
+    (hcNontrivial : Erdos536.fiberValue 1 c ≠ 1) :
+    Erdos536.fiberValue q c ∉ A := by
+  by_cases hcS : c ∈ S
+  · exact selected_upper_point_excludes_same_lower
+      hq hA hUpperSelected hOriginS hcS hcNontrivial
+  · exact maximalGammaFree_excludes_lower_fiberValue
+      hq hMax hcD hcS hA hUpperSelected
+
 end Erdos536813
