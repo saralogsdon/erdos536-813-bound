@@ -3047,13 +3047,17 @@ def TwoLayerTriangleFree
 
 /-- Executable Boolean form of `IsLcmTriangle`. -/
 def IsLcmTriangleBool (a b c : Nat) : Bool :=
-  decide (Erdos536.IsLcmTriangle a b c)
+  decide (a ≠ b) &&
+    decide (a ≠ c) &&
+    decide (b ≠ c) &&
+    decide (Nat.lcm a b = Nat.lcm a c) &&
+    decide (Nat.lcm a c = Nat.lcm b c)
 
 theorem isLcmTriangleBool_eq_true_iff
     (a b c : Nat) :
     IsLcmTriangleBool a b c = true ↔
       Erdos536.IsLcmTriangle a b c := by
-  simp [IsLcmTriangleBool]
+  simp [IsLcmTriangleBool, Erdos536.IsLcmTriangle]
 
 /-- Executable two-layer triangle-freeness checker. -/
 def TwoLayerTriangleFreeBool
