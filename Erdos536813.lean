@@ -2885,7 +2885,8 @@ theorem mem_fiveInnerBoardList
       5 * Erdos536.fiberValue 1 p ≤ T := by
   constructor
   · intro hp
-    exact (List.mem_filter.mp hp).2
+    have hBool := (List.mem_filter.mp hp).2
+    simpa using hBool
   · intro hp
     apply List.mem_filter.mpr
     constructor
