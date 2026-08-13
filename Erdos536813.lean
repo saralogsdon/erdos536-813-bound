@@ -2521,6 +2521,7 @@ theorem fiveAnnulus_i_lt_ten_of_le_728
   have hBig : 1024 ≤ Erdos536.fiberValue 1 p := by
     norm_num at hPowMono
     exact Nat.le_trans hPowMono hPowToValue
+  have hValueLeT : Erdos536.fiberValue 1 p ≤ T := hp.1
   omega
 
 /-- Every annulus point with `T ≤ 728` has `j < 6`. -/
@@ -2543,12 +2544,27 @@ theorem fiveAnnulus_j_lt_six_of_le_728
   have hBig : 729 ≤ Erdos536.fiberValue 1 p := by
     norm_num at hPowMono
     exact Nat.le_trans hPowMono hPowToValue
+  have hValueLeT : Erdos536.fiberValue 1 p ≤ T := hp.1
   omega
+
+/-- Executable Boolean form of five-annulus membership. -/
+def InFiveAnnulusBool
+    (T : Nat)
+    (p : Erdos536.GridPoint) : Bool :=
+  decide (Erdos536.fiberValue 1 p ≤ T) &&
+    decide (T < 5 * Erdos536.fiberValue 1 p)
+
+/-- The Boolean annulus predicate is exact. -/
+theorem inFiveAnnulusBool_eq_true_iff
+    (T : Nat)
+    (p : Erdos536.GridPoint) :
+    InFiveAnnulusBool T p = true ↔ InFiveAnnulus T p := by
+  simp [InFiveAnnulusBool, InFiveAnnulus]
 
 /-- Small executable annulus list sufficient throughout `T ≤ 728`. -/
 def SmallFiveAnnulusList (T : Nat) : List Erdos536.GridPoint :=
   (Erdos536.GridPoint.rect 10 6).filter
-    (fun p => decide (InFiveAnnulus T p))
+    (fun p => InFiveAnnulusBool T p)
 
 /-- Exact membership in the small annulus representation for `T ≤ 728`. -/
 theorem mem_smallFiveAnnulusList
@@ -2558,15 +2574,15 @@ theorem mem_smallFiveAnnulusList
     p ∈ SmallFiveAnnulusList T ↔ InFiveAnnulus T p := by
   constructor
   · intro hp
-    rcases List.mem_filter.mp hp with ⟨_, hAnn⟩
-    simpa using hAnn
+    rcases List.mem_filter.mp hp with ⟨_hRect, hAnnBool⟩
+    exact (inFiveAnnulusBool_eq_true_iff T p).1 hAnnBool
   · intro hp
     apply List.mem_filter.mpr
     constructor
     · rw [Erdos536.GridPoint.mem_rect]
       exact ⟨fiveAnnulus_i_lt_ten_of_le_728 hT hp,
         fiveAnnulus_j_lt_six_of_le_728 hT hp⟩
-    · simpa using hp
+    · exact (inFiveAnnulusBool_eq_true_iff T p).2 hp
 
 /-- Left critical representative for the finite annulus range. -/
 def FiniteAnnulusRepresentative (T : Nat) : Nat :=
@@ -2752,13 +2768,13 @@ theorem gammaFree_representative_deficit_three
                                                         have h := gammaFree_fiveAnnulus_720_deficit_three hGamma hSub'
                                                         simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720] using h
 
+set_option maxHeartbeats 1000000 in
 /--
 For every `120 ≤ T ≤ 728`, the small annulus board and the logarithmic
 baseline agree exactly with those at the chosen critical representative.
 Because the board has only 60 possible grid points, this finite kernel check
 is inexpensive.
 -/
-set_option maxHeartbeats 1000000 in
 theorem finiteAnnulusRepresentative_small_data
     {T : Nat}
     (hLow : 120 ≤ T)
@@ -2793,8 +2809,9 @@ theorem gammaFree_annulus_finite_deficit_three
       S.Subset (FiveAnnulusList (FiniteAnnulusRepresentative T)) := by
     intro p hp
     apply (mem_fiveAnnulusList).2
-    rcases List.mem_filter.mp hp with ⟨_, hAnn⟩
-    simpa using hAnn
+    rcases List.mem_filter.mp hp with ⟨_, hAnnBool⟩
+    exact (inFiveAnnulusBool_eq_true_iff
+      (FiniteAnnulusRepresentative T) p).1 hAnnBool
   have hRep :=
     gammaFree_representative_deficit_three T hGamma hSubBigR
   rw [hData.2]
