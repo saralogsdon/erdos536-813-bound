@@ -1401,4 +1401,282 @@ theorem orderedSelectedDoubleTops_length_le_ceiling_half
 
       simpa using hCount
 
+
+/-!
+## Base points versus double-column tops
+
+A cleaner way to finish the annulus count is to split `S` into:
+
+* base points: no selected point lies below them in the same column;
+* extra points: some selected point does lie below them.
+
+There is at most one base point for each 2-exponent.  Every extra point is
+exactly the top of a selected double column.  The double-column separation
+lemma then bounds the extra points by `ceil(J/2)`.
+-/
+
+/-- Selected points with no selected point below them in the same column. -/
+def BaseAnnulusPoints (S : List Erdos536.GridPoint) : List Erdos536.GridPoint :=
+  S.filter (fun p => decide (¬ Erdos536.HasColDown S p))
+
+/-- Selected points with a selected point below them in the same column. -/
+def ExtraAnnulusPoints (S : List Erdos536.GridPoint) : List Erdos536.GridPoint :=
+  S.filter (fun p => decide (Erdos536.HasColDown S p))
+
+/-- A list splits in length according to a decidable predicate and its negation. -/
+theorem filter_prop_partition_length
+    {α : Type}
+    (l : List α)
+    (P : α → Prop)
+    [DecidablePred P] :
+    (l.filter (fun x => decide (P x))).length +
+      (l.filter (fun x => decide (¬ P x))).length = l.length := by
+  induction l with
+  | nil => simp
+  | cons a l ih =>
+      by_cases ha : P a
+      · simp [ha, ih]
+      · simp [ha, ih]
+
+/-- The base/extra split preserves total cardinality. -/
+theorem base_extra_length_eq
+    (S : List Erdos536.GridPoint) :
+    (BaseAnnulusPoints S).length + (ExtraAnnulusPoints S).length = S.length := by
+  have h := filter_prop_partition_length S (fun p => Erdos536.HasColDown S p)
+  simpa [BaseAnnulusPoints, ExtraAnnulusPoints, Nat.add_comm] using h
+
+/-- Two base points in the same column are equal. -/
+theorem base_points_same_i_eq
+    {S : List Erdos536.GridPoint}
+    {p q : Erdos536.GridPoint}
+    (hpS : p ∈ S)
+    (hqS : q ∈ S)
+    (hpBase : ¬ Erdos536.HasColDown S p)
+    (hqBase : ¬ Erdos536.HasColDown S q)
+    (hi : p.i = q.i) :
+    p = q := by
+  rcases Nat.lt_trichotomy p.j q.j with hj | hj | hj
+  · exfalso
+    apply hqBase
+    exact ⟨p, hpS, hi, hj⟩
+  · cases p
+    cases q
+    simp_all
+  · exfalso
+    apply hpBase
+    exact ⟨q, hqS, hi.symm, hj⟩
+
+/-- The 2-exponent map is injective on base points. -/
+theorem base_i_injective_on
+    {S : List Erdos536.GridPoint}
+    {p q : Erdos536.GridPoint}
+    (hp : p ∈ BaseAnnulusPoints S)
+    (hq : q ∈ BaseAnnulusPoints S)
+    (hi : p.i = q.i) :
+    p = q := by
+  rcases List.mem_filter.mp hp with ⟨hpS, hpBase⟩
+  rcases List.mem_filter.mp hq with ⟨hqS, hqBase⟩
+  exact base_points_same_i_eq hpS hqS (by simpa using hpBase) (by simpa using hqBase) hi
+
+/-- The list of base-point 2-exponents has no duplicates. -/
+theorem base_i_map_nodup
+    {S : List Erdos536.GridPoint}
+    (hSNodup : S.Nodup) :
+    ((BaseAnnulusPoints S).map (fun p => p.i)).Nodup := by
+  have hBaseNodup : (BaseAnnulusPoints S).Nodup := by
+    exact hSNodup.filter (fun p => decide (¬ Erdos536.HasColDown S p))
+  exact hBaseNodup.map_on (fun p hp q hq hi => base_i_injective_on hp hq hi)
+
+/-- A duplicate-free list of naturals lying in `range K` has length at most `K`. -/
+theorem nodup_nat_list_length_le_of_forall_lt
+    {l : List Nat}
+    {K : Nat}
+    (hNodup : l.Nodup)
+    (hBound : ∀ n ∈ l, n < K) :
+    l.length ≤ K := by
+  have hSub : l.toFinset ⊆ Finset.range K := by
+    intro n hn
+    have hnL : n ∈ l := by simpa using hn
+    simpa using hBound n hnL
+  have hCard := Finset.card_le_card hSub
+  simpa [hNodup] using hCard
+
+/-- Base points contribute at most one point for each `i = 0,...,I`. -/
+theorem baseAnnulusPoints_length_le
+    {S : List Erdos536.GridPoint}
+    {I : Nat}
+    (hSNodup : S.Nodup)
+    (hIBound : ∀ p ∈ S, p.i ≤ I) :
+    (BaseAnnulusPoints S).length ≤ I + 1 := by
+  have hNodup := base_i_map_nodup hSNodup
+  have hBound :
+      ∀ i ∈ (BaseAnnulusPoints S).map (fun p => p.i), i < I + 1 := by
+    intro i hi
+    rcases List.mem_map.mp hi with ⟨p, hpBase, rfl⟩
+    have hpS : p ∈ S := (List.mem_filter.mp hpBase).1
+    omega
+  have h := nodup_nat_list_length_le_of_forall_lt hNodup hBound
+  simpa using h
+
+/-- Every extra annulus point is the top of a selected double column. -/
+theorem extra_point_is_double_top
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    {p : Erdos536.GridPoint}
+    (hSAnn : ∀ x ∈ S, InFiveAnnulus T x)
+    (hpExtra : p ∈ ExtraAnnulusPoints S) :
+    ∃ down, IsSelectedAnnulusDoubleColumn T S p down := by
+  rcases List.mem_filter.mp hpExtra with ⟨hpS, hpCol⟩
+  have hpCol' : Erdos536.HasColDown S p := by simpa using hpCol
+  rcases hpCol' with ⟨down, hdownS, hSameI, hDownLt⟩
+  have hpAnn := hSAnn p hpS
+  have hdownAnn := hSAnn down hdownS
+  have hClose : p.j ≤ down.j + 1 :=
+    fiveAnnulus_same_i_j_le_add_one hdownAnn hpAnn hSameI (Nat.le_of_lt hDownLt)
+  have hConsec : down.j + 1 = p.j := by omega
+  exact ⟨down, hpS, hdownS, hpAnn, hdownAnn, hSameI.symm, hConsec⟩
+
+/-- Distinct extra points cannot have the same 2-exponent. -/
+theorem extra_points_same_i_eq
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    (hSAnn : ∀ x ∈ S, InFiveAnnulus T x)
+    {p q : Erdos536.GridPoint}
+    (hpExtra : p ∈ ExtraAnnulusPoints S)
+    (hqExtra : q ∈ ExtraAnnulusPoints S)
+    (hi : p.i = q.i) :
+    p = q := by
+  rcases extra_point_is_double_top hSAnn hpExtra with ⟨pDown, hP⟩
+  rcases extra_point_is_double_top hSAnn hqExtra with ⟨qDown, hQ⟩
+  by_contra hpq
+  rcases Nat.lt_trichotomy p.j q.j with hpqj | hpqj | hpqj
+  · have hDistinct : pDown ≠ p ∧ pDown ≠ q ∧ p ≠ q := by
+      rcases hP with ⟨_hpS, _hpdS, _hpAnn, _hpdAnn, hpI, hpJ⟩
+      constructor
+      · intro h; subst pDown; omega
+      constructor
+      · intro h; subst pDown; omega
+      · exact hpq
+    have hpDownAnn := hP.2.2.2.1
+    have hpAnn := hP.2.2.1
+    have hqAnn := hQ.2.2.1
+    have hpDownI : pDown.i = p.i := hP.2.2.2.2.1.symm
+    exact (fiveAnnulus_same_i_three_points_not_pairwise_distinct
+      hpDownAnn hpAnn hqAnn hpDownI (hpDownI.trans hi)) hDistinct
+  · apply hpq
+    cases p
+    cases q
+    simp_all
+  · have hDistinct : qDown ≠ q ∧ qDown ≠ p ∧ q ≠ p := by
+      rcases hQ with ⟨_hqS, _hqdS, _hqAnn, _hqdAnn, hqI, hqJ⟩
+      constructor
+      · intro h; subst qDown; omega
+      constructor
+      · intro h; subst qDown; omega
+      · exact hpq.symm
+    have hqDownAnn := hQ.2.2.2.1
+    have hqAnn := hQ.2.2.1
+    have hpAnn := hP.2.2.1
+    have hqDownI : qDown.i = q.i := hQ.2.2.2.2.1.symm
+    exact (fiveAnnulus_same_i_three_points_not_pairwise_distinct
+      hqDownAnn hqAnn hpAnn hqDownI (hqDownI.trans hi.symm)) hDistinct
+
+/-- Extra points have pairwise 3-exponents separated by at least two. -/
+theorem extra_points_j_separated
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSAnn : ∀ x ∈ S, InFiveAnnulus T x)
+    {p q : Erdos536.GridPoint}
+    (hpExtra : p ∈ ExtraAnnulusPoints S)
+    (hqExtra : q ∈ ExtraAnnulusPoints S)
+    (hpq : p ≠ q) :
+    q.j + 2 ≤ p.j ∨ p.j + 2 ≤ q.j := by
+  rcases extra_point_is_double_top hSAnn hpExtra with ⟨pDown, hP⟩
+  rcases extra_point_is_double_top hSAnn hqExtra with ⟨qDown, hQ⟩
+  have hiNe : p.i ≠ q.i := by
+    intro hi
+    exact hpq (extra_points_same_i_eq hSAnn hpExtra hqExtra hi)
+  rcases Nat.lt_or_gt_of_ne hiNe with hi | hi
+  · exact Or.inl (selectedAnnulusDoubleColumns_top_j_drop_at_least_two hGamma hP hQ hi)
+  · exact Or.inr (selectedAnnulusDoubleColumns_top_j_drop_at_least_two hGamma hQ hP hi)
+
+/-- Index used to inject separated positive 3-exponents into `0,...,ceil(J/2)-1`. -/
+def halfIndex (j : Nat) : Nat := (j - 1) / 2
+
+/-- Separation by at least two makes `halfIndex` injective. -/
+theorem halfIndex_ne_of_gap_two
+    {a b : Nat}
+    (ha : 1 ≤ a)
+    (hb : 1 ≤ b)
+    (hGap : b + 2 ≤ a ∨ a + 2 ≤ b) :
+    halfIndex a ≠ halfIndex b := by
+  unfold halfIndex
+  omega
+
+/-- Extra-point half-indices are duplicate-free. -/
+theorem extra_halfIndex_map_nodup
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSAnn : ∀ x ∈ S, InFiveAnnulus T x) :
+    ((ExtraAnnulusPoints S).map (fun p => halfIndex p.j)).Nodup := by
+  have hExtraNodup : (ExtraAnnulusPoints S).Nodup := by
+    exact hGamma.1.filter (fun p => decide (Erdos536.HasColDown S p))
+  apply hExtraNodup.map_on
+  intro p hp q hq hEq
+  by_contra hpq
+  have hGap := extra_points_j_separated hGamma hSAnn hp hq hpq
+  rcases extra_point_is_double_top hSAnn hp with ⟨pDown, hP⟩
+  rcases extra_point_is_double_top hSAnn hq with ⟨qDown, hQ⟩
+  have hpPos := selectedAnnulusDoubleColumn_top_j_pos hP
+  have hqPos := selectedAnnulusDoubleColumn_top_j_pos hQ
+  exact (halfIndex_ne_of_gap_two hpPos hqPos hGap) hEq
+
+/-- Extra points contribute at most `ceil(J/2)` points. -/
+theorem extraAnnulusPoints_length_le_ceiling_half
+    {T J : Nat}
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSAnn : ∀ x ∈ S, InFiveAnnulus T x)
+    (hJBound : ∀ p ∈ S, p.j ≤ J) :
+    (ExtraAnnulusPoints S).length ≤ (J + 1) / 2 := by
+  have hNodup := extra_halfIndex_map_nodup hGamma hSAnn
+  have hBound :
+      ∀ n ∈ (ExtraAnnulusPoints S).map (fun p => halfIndex p.j),
+        n < (J + 1) / 2 := by
+    intro n hn
+    rcases List.mem_map.mp hn with ⟨p, hpExtra, rfl⟩
+    have hpS : p ∈ S := (List.mem_filter.mp hpExtra).1
+    rcases extra_point_is_double_top hSAnn hpExtra with ⟨down, hDouble⟩
+    have hpPos := selectedAnnulusDoubleColumn_top_j_pos hDouble
+    have hpJ := hJBound p hpS
+    unfold halfIndex
+    omega
+  have h := nodup_nat_list_length_le_of_forall_lt hNodup hBound
+  simpa using h
+
+/--
+The large-scale annulus counting inequality in coordinate-bound form.
+
+If `S` is Gamma-free, all of its points lie in the factor-5 annulus, and
+all coordinates satisfy `i ≤ I`, `j ≤ J`, then
+
+    |S| ≤ (I+1) + ceil(J/2).
+-/
+theorem gammaFree_annulus_length_le_coordinate_bound
+    {T I J : Nat}
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSAnn : ∀ p ∈ S, InFiveAnnulus T p)
+    (hIBound : ∀ p ∈ S, p.i ≤ I)
+    (hJBound : ∀ p ∈ S, p.j ≤ J) :
+    S.length ≤ (I + 1) + (J + 1) / 2 := by
+  have hBase : (BaseAnnulusPoints S).length ≤ I + 1 :=
+    baseAnnulusPoints_length_le hGamma.1 hIBound
+  have hExtra : (ExtraAnnulusPoints S).length ≤ (J + 1) / 2 :=
+    extraAnnulusPoints_length_le_ceiling_half hGamma hSAnn hJBound
+  have hSplit := base_extra_length_eq S
+  omega
+
 end Erdos536813
