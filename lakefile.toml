@@ -1,6 +1,21 @@
-name = "erdos536"
+name = "Erdos536813"
 version = "0.1.0"
-defaultTargets = ["Erdos536"]
+defaultTargets = ["Erdos536813"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+
+[[require]]
+name = "Erdos536"
+git = "https://github.com/KitaKen1/erdos536-lean-five-six-bound.git"
+rev = "47332ac6f3ed35b9627e5176785e04422cd527cf"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.31.0"
 
 [[lean_lib]]
-name = "Erdos536"
+name = "Erdos536813"
+roots = ["Erdos536813"]
