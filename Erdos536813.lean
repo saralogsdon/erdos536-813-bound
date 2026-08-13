@@ -2488,4 +2488,164 @@ theorem gammaFree_fiveAnnulus_720_deficit_three
   norm_num [L23, Nat.log]
   omega
 
+
+/-!
+## Filling the intervals between critical annulus states
+
+For `120 ≤ T ≤ 728`, the annulus board and the logarithmic baseline change
+only at the critical states certified above. We choose the left endpoint of
+the corresponding constant interval as a canonical representative.
+-/
+
+def FiniteAnnulusRepresentative (T : Nat) : Nat :=
+  if T < 128 then 120 else
+    if T < 135 then 128 else
+      if T < 144 then 135 else
+        if T < 160 then 144 else
+          if T < 162 then 160 else
+            if T < 180 then 162 else
+              if T < 192 then 180 else
+                if T < 216 then 192 else
+                  if T < 240 then 216 else
+                    if T < 243 then 240 else
+                      if T < 256 then 243 else
+                        if T < 270 then 256 else
+                          if T < 288 then 270 else
+                            if T < 320 then 288 else
+                              if T < 324 then 320 else
+                                if T < 360 then 324 else
+                                  if T < 384 then 360 else
+                                    if T < 405 then 384 else
+                                      if T < 432 then 405 else
+                                        if T < 480 then 432 else
+                                          if T < 486 then 480 else
+                                            if T < 512 then 486 else
+                                              if T < 540 then 512 else
+                                                if T < 576 then 540 else
+                                                  if T < 640 then 576 else
+                                                    if T < 648 then 640 else
+                                                      if T < 720 then 648 else
+                                                        720
+
+/--
+Every representative chosen by `FiniteAnnulusRepresentative` is one of the
+kernel-certified critical annulus states.
+-/
+theorem finiteAnnulusRepresentative_subset_bound_bool (T : Nat) :
+    GammaFreeSubsetBoundBool
+      (FiveAnnulusList (FiniteAnnulusRepresentative T))
+      (L23 (FiniteAnnulusRepresentative T) - 3) = true := by
+  by_cases h128 : T < 128
+  · simpa [FiniteAnnulusRepresentative, h128, L23, Nat.log] using fiveAnnulus_120_subset_bound_bool
+  · by_cases h135 : T < 135
+    · simpa [FiniteAnnulusRepresentative, h128, h135, L23, Nat.log] using fiveAnnulus_128_subset_bound_bool
+    · by_cases h144 : T < 144
+      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, L23, Nat.log] using fiveAnnulus_135_subset_bound_bool
+      · by_cases h160 : T < 160
+        · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, L23, Nat.log] using fiveAnnulus_144_subset_bound_bool
+        · by_cases h162 : T < 162
+          · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, L23, Nat.log] using fiveAnnulus_160_subset_bound_bool
+          · by_cases h180 : T < 180
+            · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, L23, Nat.log] using fiveAnnulus_162_subset_bound_bool
+            · by_cases h192 : T < 192
+              · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, L23, Nat.log] using fiveAnnulus_180_subset_bound_bool
+              · by_cases h216 : T < 216
+                · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, L23, Nat.log] using fiveAnnulus_192_subset_bound_bool
+                · by_cases h240 : T < 240
+                  · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, L23, Nat.log] using fiveAnnulus_216_subset_bound_bool
+                  · by_cases h243 : T < 243
+                    · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, L23, Nat.log] using fiveAnnulus_240_subset_bound_bool
+                    · by_cases h256 : T < 256
+                      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, L23, Nat.log] using fiveAnnulus_243_subset_bound_bool
+                      · by_cases h270 : T < 270
+                        · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, L23, Nat.log] using fiveAnnulus_256_subset_bound_bool
+                        · by_cases h288 : T < 288
+                          · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, L23, Nat.log] using fiveAnnulus_270_subset_bound_bool
+                          · by_cases h320 : T < 320
+                            · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, L23, Nat.log] using fiveAnnulus_288_subset_bound_bool
+                            · by_cases h324 : T < 324
+                              · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, L23, Nat.log] using fiveAnnulus_320_subset_bound_bool
+                              · by_cases h360 : T < 360
+                                · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, L23, Nat.log] using fiveAnnulus_324_subset_bound_bool
+                                · by_cases h384 : T < 384
+                                  · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, L23, Nat.log] using fiveAnnulus_360_subset_bound_bool
+                                  · by_cases h405 : T < 405
+                                    · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, L23, Nat.log] using fiveAnnulus_384_subset_bound_bool
+                                    · by_cases h432 : T < 432
+                                      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, L23, Nat.log] using fiveAnnulus_405_subset_bound_bool
+                                      · by_cases h480 : T < 480
+                                        · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, L23, Nat.log] using fiveAnnulus_432_subset_bound_bool
+                                        · by_cases h486 : T < 486
+                                          · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, L23, Nat.log] using fiveAnnulus_480_subset_bound_bool
+                                          · by_cases h512 : T < 512
+                                            · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, L23, Nat.log] using fiveAnnulus_486_subset_bound_bool
+                                            · by_cases h540 : T < 540
+                                              · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, L23, Nat.log] using fiveAnnulus_512_subset_bound_bool
+                                              · by_cases h576 : T < 576
+                                                · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, L23, Nat.log] using fiveAnnulus_540_subset_bound_bool
+                                                · by_cases h640 : T < 640
+                                                  · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, L23, Nat.log] using fiveAnnulus_576_subset_bound_bool
+                                                  · by_cases h648 : T < 648
+                                                    · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, L23, Nat.log] using fiveAnnulus_640_subset_bound_bool
+                                                    · by_cases h720 : T < 720
+                                                      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720, L23, Nat.log] using fiveAnnulus_648_subset_bound_bool
+                                                      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720, L23, Nat.log] using fiveAnnulus_720_subset_bound_bool
+
+
+/--
+On the whole finite range, `T` and its representative have exactly the same
+annulus list and the same logarithmic baseline.
+-/
+theorem finiteAnnulusRepresentative_data
+    {T : Nat}
+    (hLow : 120 ≤ T)
+    (hHigh : T ≤ 728) :
+    FiveAnnulusList T =
+        FiveAnnulusList (FiniteAnnulusRepresentative T) ∧
+      L23 T = L23 (FiniteAnnulusRepresentative T) := by
+  interval_cases T <;> native_decide
+
+/--
+Uniform finite annulus lemma: every Gamma-free annulus family has deficit at
+least three throughout `120 ≤ T ≤ 728`.
+-/
+theorem gammaFree_annulus_finite_deficit_three
+    {T : Nat}
+    (hLow : 120 ≤ T)
+    (hHigh : T ≤ 728)
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSAnn :
+      ∀ p ∈ S, InFiveAnnulus T p) :
+    S.length + 3 ≤ L23 T := by
+  have hData := finiteAnnulusRepresentative_data hLow hHigh
+  have hSubT : S.Subset (FiveAnnulusList T) := by
+    intro p hp
+    exact (mem_fiveAnnulusList).2 (hSAnn p hp)
+  have hSubR :
+      S.Subset (FiveAnnulusList (FiniteAnnulusRepresentative T)) := by
+    intro p hp
+    rw [← hData.1]
+    exact hSubT hp
+  have hCert :=
+    finiteAnnulusRepresentative_subset_bound_bool T
+  have hLen :
+      S.length ≤ L23 (FiniteAnnulusRepresentative T) - 3 := by
+    exact gammaFree_length_le_of_subsetBoundBool
+      hCert hGamma hSubR
+  have hLog2 : 1 ≤ Nat.log 2 T := by
+    apply Nat.le_log_of_pow_le (by decide : 1 < (2 : Nat))
+    norm_num
+    omega
+  have hLog3 : 1 ≤ Nat.log 3 T := by
+    apply Nat.le_log_of_pow_le (by decide : 1 < (3 : Nat))
+    norm_num
+    omega
+  have hBaseT : 3 ≤ L23 T := by
+    unfold L23
+    omega
+  have hBaseR : 3 ≤ L23 (FiniteAnnulusRepresentative T) := by
+    omega
+  omega
+
 end Erdos536813
