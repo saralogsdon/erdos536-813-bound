@@ -259,4 +259,166 @@ theorem maximalGammaFree_missing_point_has_old_pair
     refine ⟨top, left, htopS, hleftS, Or.inr (Or.inr ?_)⟩
     simpa [hdownc] using hGamma
 
+
+/--
+If 5 is coprime to the fiber base, then it is coprime to every value in
+that 2,3-fiber.
+-/
+theorem coprime_five_fiberValue
+    {m : Nat}
+    (h5m : Nat.Coprime 5 m)
+    (p : Erdos536.GridPoint) :
+    Nat.Coprime 5 (Erdos536.fiberValue m p) := by
+  exact Nat.Coprime.mul_right
+    (Nat.Coprime.mul_right
+      h5m
+      (Nat.Coprime.pow_right p.i (by decide : Nat.Coprime 5 2)))
+    (Nat.Coprime.pow_right p.j (by decide : Nat.Coprime 5 3))
+
+/-- In a 5-free fiber, no fiber value is divisible by 5. -/
+theorem not_five_dvd_fiberValue
+    {m : Nat}
+    (h5m : Nat.Coprime 5 m)
+    (p : Erdos536.GridPoint) :
+    ¬ 5 ∣ Erdos536.fiberValue m p := by
+  intro hDvd
+  have hEq : 5 = 1 :=
+    (coprime_five_fiberValue h5m p).eq_one_of_dvd hDvd
+  exact (by decide : (5 : Nat) ≠ 1) hEq
+
+/--
+Scaling all three vertices of an LCM triangle by the same positive factor
+preserves the LCM-triangle property.
+-/
+theorem scale_is_lcmTriangle
+    {q a b c : Nat}
+    (hq : 0 < q)
+    (htri : Erdos536.IsLcmTriangle a b c) :
+    Erdos536.IsLcmTriangle (q * a) (q * b) (q * c) := by
+  rcases htri with ⟨hab, hac, hbc, hlab_ac, hlac_bc⟩
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · intro hEq
+    apply hab
+    exact Nat.mul_left_cancel hq hEq
+  · intro hEq
+    apply hac
+    exact Nat.mul_left_cancel hq hEq
+  · intro hEq
+    apply hbc
+    exact Nat.mul_left_cancel hq hEq
+  · calc
+      Nat.lcm (q * a) (q * b) = q * Nat.lcm a b := by
+        rw [Nat.lcm_mul_left]
+      _ = q * Nat.lcm a c := by rw [hlab_ac]
+      _ = Nat.lcm (q * a) (q * c) := by
+        rw [Nat.lcm_mul_left]
+  · calc
+      Nat.lcm (q * a) (q * c) = q * Nat.lcm a c := by
+        rw [Nat.lcm_mul_left]
+      _ = q * Nat.lcm b c := by rw [hlac_bc]
+      _ = Nat.lcm (q * b) (q * c) := by
+        rw [Nat.lcm_mul_left]
+
+/--
+Core 5-adic blocking bridge.
+
+Let `S` be maximal Gamma-free in `D`, and let `c` be a missing board point.
+Then there are two old points `u,v ∈ S` such that, for every positive common
+scale `q`, the two upper-layer values
+
+    q * (5 * 2^u.i * 3^u.j),  q * (5 * 2^v.i * 3^v.j)
+
+together with the lower-layer value
+
+    q * (2^c.i * 3^c.j)
+
+form an LCM triangle.
+
+Crucially, `q` is arbitrary positive: it may already contain powers of 5.
+Thus this applies between every pair of adjacent 5-adic layers, not only
+between the bottom two.
+-/
+theorem maximalGammaFree_blocks_across_five
+    {D S : List Erdos536.GridPoint}
+    {c : Erdos536.GridPoint}
+    {q : Nat}
+    (hq : 0 < q)
+    (hMax : MaximalGammaFreeIn D S)
+    (hcD : c ∈ D)
+    (hcS : c ∉ S) :
+    ∃ u v : Erdos536.GridPoint,
+      u ∈ S ∧
+      v ∈ S ∧
+      Erdos536.IsLcmTriangle
+        (q * (5 * Erdos536.fiberValue 1 u))
+        (q * (5 * Erdos536.fiberValue 1 v))
+        (q * Erdos536.fiberValue 1 c) := by
+  rcases maximalGammaFree_missing_point_has_old_pair hMax hcD hcS with
+    ⟨u, v, huS, hvS, hGamma⟩
+  refine ⟨u, v, huS, hvS, ?_⟩
+
+  have h5c : ¬ 5 ∣ Erdos536.fiberValue 1 c :=
+    not_five_dvd_fiberValue (m := 1) (by decide) c
+
+  rcases hGamma with hCuv | hUcv | hUvc
+  ·
+    -- c is the Gamma top; u and v are the two old arms.
+    rcases Erdos536.gamma_fiberValues_pairwise_distinct
+      (m := 1) (by decide : 0 < (1 : Nat)) hCuv with
+      ⟨_hCU, _hCV, hUVne⟩
+    rcases Erdos536.gamma_pairwise_lcms_eq_top 1 hCuv with
+      ⟨hCU, hCV, hUV⟩
+    have hCross :
+        Erdos536.IsLcmTriangle
+          (5 * Erdos536.fiberValue 1 u)
+          (5 * Erdos536.fiberValue 1 v)
+          (Erdos536.fiberValue 1 c) := by
+      apply lift_two_by_five_is_lcmTriangle
+        (w := Erdos536.fiberValue 1 c) hUVne hUV
+      · simpa [Nat.lcm_comm] using hCU
+      · simpa [Nat.lcm_comm] using hCV
+      · exact coprime_five_fiberValue (m := 1) (by decide) c
+      · exact h5c
+    exact scale_is_lcmTriangle hq hCross
+
+  ·
+    -- u is the Gamma top, c is the left arm, v is the down arm.
+    rcases Erdos536.gamma_fiberValues_pairwise_distinct
+      (m := 1) (by decide : 0 < (1 : Nat)) hUcv with
+      ⟨_hUC, hUVne, _hCV⟩
+    rcases Erdos536.gamma_pairwise_lcms_eq_top 1 hUcv with
+      ⟨hUC, hUV, hCV⟩
+    have hCross :
+        Erdos536.IsLcmTriangle
+          (5 * Erdos536.fiberValue 1 u)
+          (5 * Erdos536.fiberValue 1 v)
+          (Erdos536.fiberValue 1 c) := by
+      apply lift_two_by_five_is_lcmTriangle
+        (w := Erdos536.fiberValue 1 u) hUVne hUV
+      · exact hUC
+      · simpa [Nat.lcm_comm] using hCV
+      · exact coprime_five_fiberValue (m := 1) (by decide) u
+      · exact h5c
+    exact scale_is_lcmTriangle hq hCross
+
+  ·
+    -- u is the Gamma top, v is the left arm, c is the down arm.
+    rcases Erdos536.gamma_fiberValues_pairwise_distinct
+      (m := 1) (by decide : 0 < (1 : Nat)) hUvc with
+      ⟨hUVne, _hUC, _hVC⟩
+    rcases Erdos536.gamma_pairwise_lcms_eq_top 1 hUvc with
+      ⟨hUV, hUC, hVC⟩
+    have hCross :
+        Erdos536.IsLcmTriangle
+          (5 * Erdos536.fiberValue 1 u)
+          (5 * Erdos536.fiberValue 1 v)
+          (Erdos536.fiberValue 1 c) := by
+      apply lift_two_by_five_is_lcmTriangle
+        (w := Erdos536.fiberValue 1 u) hUVne hUV
+      · exact hUC
+      · exact hVC
+      · exact coprime_five_fiberValue (m := 1) (by decide) u
+      · exact h5c
+    exact scale_is_lcmTriangle hq hCross
+
 end Erdos536813
