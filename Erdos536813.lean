@@ -2490,13 +2490,85 @@ theorem gammaFree_fiveAnnulus_720_deficit_three
 
 
 /-!
-## Filling the intervals between critical annulus states
+## Efficient finite-range interpolation
 
-For `120 ≤ T ≤ 728`, the annulus board and the logarithmic baseline change
-only at the critical states certified above. We choose the left endpoint of
-the corresponding constant interval as a canonical representative.
+The critical-state certificates above are already kernel-checked.  To fill
+the gaps between them without expanding the very large `FiveAnnulusList`,
+we use the fixed rectangle `0 ≤ i < 10`, `0 ≤ j < 6`.  Every annulus point
+with `T ≤ 728` lies in this rectangle, since `2^10 > 728` and `3^6 > 728`.
+
+This gives a small executable representation whose equality between
+successive critical states is cheap for the kernel to check.
 -/
 
+/-- Every annulus point with `T ≤ 728` has `i < 10`. -/
+theorem fiveAnnulus_i_lt_ten_of_le_728
+    {T : Nat}
+    {p : Erdos536.GridPoint}
+    (hT : T ≤ 728)
+    (hp : InFiveAnnulus T p) :
+    p.i < 10 := by
+  by_contra h
+  have hi : 10 ≤ p.i := Nat.le_of_not_gt h
+  have hPowMono : 2 ^ 10 ≤ 2 ^ p.i :=
+    Nat.pow_le_pow_right (by decide : 0 < (2 : Nat)) hi
+  have h3pos : 0 < 3 ^ p.j :=
+    Nat.pow_pos (by decide : 0 < (3 : Nat))
+  have hPowToValue :
+      2 ^ p.i ≤ Erdos536.fiberValue 1 p := by
+    have hmul := Nat.le_mul_of_pos_right (2 ^ p.i) h3pos
+    simpa [Erdos536.fiberValue] using hmul
+  have hBig : 1024 ≤ Erdos536.fiberValue 1 p := by
+    norm_num at hPowMono
+    exact Nat.le_trans hPowMono hPowToValue
+  omega
+
+/-- Every annulus point with `T ≤ 728` has `j < 6`. -/
+theorem fiveAnnulus_j_lt_six_of_le_728
+    {T : Nat}
+    {p : Erdos536.GridPoint}
+    (hT : T ≤ 728)
+    (hp : InFiveAnnulus T p) :
+    p.j < 6 := by
+  by_contra h
+  have hj : 6 ≤ p.j := Nat.le_of_not_gt h
+  have hPowMono : 3 ^ 6 ≤ 3 ^ p.j :=
+    Nat.pow_le_pow_right (by decide : 0 < (3 : Nat)) hj
+  have h2pos : 0 < 2 ^ p.i :=
+    Nat.pow_pos (by decide : 0 < (2 : Nat))
+  have hPowToValue :
+      3 ^ p.j ≤ Erdos536.fiberValue 1 p := by
+    have hmul := Nat.le_mul_of_pos_left (3 ^ p.j) h2pos
+    simpa [Erdos536.fiberValue, Nat.mul_comm] using hmul
+  have hBig : 729 ≤ Erdos536.fiberValue 1 p := by
+    norm_num at hPowMono
+    exact Nat.le_trans hPowMono hPowToValue
+  omega
+
+/-- Small executable annulus list sufficient throughout `T ≤ 728`. -/
+def SmallFiveAnnulusList (T : Nat) : List Erdos536.GridPoint :=
+  (Erdos536.GridPoint.rect 10 6).filter
+    (fun p => decide (InFiveAnnulus T p))
+
+/-- Exact membership in the small annulus representation for `T ≤ 728`. -/
+theorem mem_smallFiveAnnulusList
+    {T : Nat}
+    (hT : T ≤ 728)
+    {p : Erdos536.GridPoint} :
+    p ∈ SmallFiveAnnulusList T ↔ InFiveAnnulus T p := by
+  constructor
+  · intro hp
+    rcases List.mem_filter.mp hp with ⟨_, hAnn⟩
+    simpa using hAnn
+  · intro hp
+    apply List.mem_filter.mpr
+    constructor
+    · rw [Erdos536.GridPoint.mem_rect]
+      exact ⟨fiveAnnulus_i_lt_ten_of_le_728 hT hp,
+        fiveAnnulus_j_lt_six_of_le_728 hT hp⟩
+    · simpa using hp
+
+/-- Left critical representative for the finite annulus range. -/
 def FiniteAnnulusRepresentative (T : Nat) : Nat :=
   if T < 128 then 120 else
     if T < 135 then 128 else
@@ -2527,87 +2599,177 @@ def FiniteAnnulusRepresentative (T : Nat) : Nat :=
                                                       if T < 720 then 648 else
                                                         720
 
+
 /--
-Every representative chosen by `FiniteAnnulusRepresentative` is one of the
-kernel-certified critical annulus states.
+The critical representative carries the already-certified deficit-three
+bound.  This theorem only dispatches to the corresponding critical-state
+theorem; it performs no new exhaustive search.
 -/
-theorem finiteAnnulusRepresentative_subset_bound_bool (T : Nat) :
-    GammaFreeSubsetBoundBool
-      (FiveAnnulusList (FiniteAnnulusRepresentative T))
-      (L23 (FiniteAnnulusRepresentative T) - 3) = true := by
+theorem gammaFree_representative_deficit_three
+    (T : Nat)
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub :
+      S.Subset (FiveAnnulusList (FiniteAnnulusRepresentative T))) :
+    S.length + 3 ≤ L23 (FiniteAnnulusRepresentative T) := by
   by_cases h128 : T < 128
-  · simpa [FiniteAnnulusRepresentative, h128, L23, Nat.log] using fiveAnnulus_120_subset_bound_bool
+  · have hSub' : S.Subset (FiveAnnulusList 120) := by
+      simpa [FiniteAnnulusRepresentative, h128] using hSub
+    have h := gammaFree_fiveAnnulus_120_deficit_three hGamma hSub'
+    simpa [FiniteAnnulusRepresentative, h128] using h
   · by_cases h135 : T < 135
-    · simpa [FiniteAnnulusRepresentative, h128, h135, L23, Nat.log] using fiveAnnulus_128_subset_bound_bool
+    · have hSub' : S.Subset (FiveAnnulusList 128) := by
+        simpa [FiniteAnnulusRepresentative, h128, h135] using hSub
+      have h := gammaFree_fiveAnnulus_128_deficit_three hGamma hSub'
+      simpa [FiniteAnnulusRepresentative, h128, h135] using h
     · by_cases h144 : T < 144
-      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, L23, Nat.log] using fiveAnnulus_135_subset_bound_bool
+      · have hSub' : S.Subset (FiveAnnulusList 135) := by
+          simpa [FiniteAnnulusRepresentative, h128, h135, h144] using hSub
+        have h := gammaFree_fiveAnnulus_135_deficit_three hGamma hSub'
+        simpa [FiniteAnnulusRepresentative, h128, h135, h144] using h
       · by_cases h160 : T < 160
-        · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, L23, Nat.log] using fiveAnnulus_144_subset_bound_bool
+        · have hSub' : S.Subset (FiveAnnulusList 144) := by
+            simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160] using hSub
+          have h := gammaFree_fiveAnnulus_144_deficit_three hGamma hSub'
+          simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160] using h
         · by_cases h162 : T < 162
-          · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, L23, Nat.log] using fiveAnnulus_160_subset_bound_bool
+          · have hSub' : S.Subset (FiveAnnulusList 160) := by
+              simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162] using hSub
+            have h := gammaFree_fiveAnnulus_160_deficit_three hGamma hSub'
+            simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162] using h
           · by_cases h180 : T < 180
-            · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, L23, Nat.log] using fiveAnnulus_162_subset_bound_bool
+            · have hSub' : S.Subset (FiveAnnulusList 162) := by
+                simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180] using hSub
+              have h := gammaFree_fiveAnnulus_162_deficit_three hGamma hSub'
+              simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180] using h
             · by_cases h192 : T < 192
-              · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, L23, Nat.log] using fiveAnnulus_180_subset_bound_bool
+              · have hSub' : S.Subset (FiveAnnulusList 180) := by
+                  simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192] using hSub
+                have h := gammaFree_fiveAnnulus_180_deficit_three hGamma hSub'
+                simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192] using h
               · by_cases h216 : T < 216
-                · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, L23, Nat.log] using fiveAnnulus_192_subset_bound_bool
+                · have hSub' : S.Subset (FiveAnnulusList 192) := by
+                    simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216] using hSub
+                  have h := gammaFree_fiveAnnulus_192_deficit_three hGamma hSub'
+                  simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216] using h
                 · by_cases h240 : T < 240
-                  · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, L23, Nat.log] using fiveAnnulus_216_subset_bound_bool
+                  · have hSub' : S.Subset (FiveAnnulusList 216) := by
+                      simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240] using hSub
+                    have h := gammaFree_fiveAnnulus_216_deficit_three hGamma hSub'
+                    simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240] using h
                   · by_cases h243 : T < 243
-                    · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, L23, Nat.log] using fiveAnnulus_240_subset_bound_bool
+                    · have hSub' : S.Subset (FiveAnnulusList 240) := by
+                        simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243] using hSub
+                      have h := gammaFree_fiveAnnulus_240_deficit_three hGamma hSub'
+                      simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243] using h
                     · by_cases h256 : T < 256
-                      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, L23, Nat.log] using fiveAnnulus_243_subset_bound_bool
+                      · have hSub' : S.Subset (FiveAnnulusList 243) := by
+                          simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256] using hSub
+                        have h := gammaFree_fiveAnnulus_243_deficit_three hGamma hSub'
+                        simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256] using h
                       · by_cases h270 : T < 270
-                        · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, L23, Nat.log] using fiveAnnulus_256_subset_bound_bool
+                        · have hSub' : S.Subset (FiveAnnulusList 256) := by
+                            simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270] using hSub
+                          have h := gammaFree_fiveAnnulus_256_deficit_three hGamma hSub'
+                          simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270] using h
                         · by_cases h288 : T < 288
-                          · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, L23, Nat.log] using fiveAnnulus_270_subset_bound_bool
+                          · have hSub' : S.Subset (FiveAnnulusList 270) := by
+                              simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288] using hSub
+                            have h := gammaFree_fiveAnnulus_270_deficit_three hGamma hSub'
+                            simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288] using h
                           · by_cases h320 : T < 320
-                            · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, L23, Nat.log] using fiveAnnulus_288_subset_bound_bool
+                            · have hSub' : S.Subset (FiveAnnulusList 288) := by
+                                simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320] using hSub
+                              have h := gammaFree_fiveAnnulus_288_deficit_three hGamma hSub'
+                              simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320] using h
                             · by_cases h324 : T < 324
-                              · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, L23, Nat.log] using fiveAnnulus_320_subset_bound_bool
+                              · have hSub' : S.Subset (FiveAnnulusList 320) := by
+                                  simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324] using hSub
+                                have h := gammaFree_fiveAnnulus_320_deficit_three hGamma hSub'
+                                simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324] using h
                               · by_cases h360 : T < 360
-                                · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, L23, Nat.log] using fiveAnnulus_324_subset_bound_bool
+                                · have hSub' : S.Subset (FiveAnnulusList 324) := by
+                                    simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360] using hSub
+                                  have h := gammaFree_fiveAnnulus_324_deficit_three hGamma hSub'
+                                  simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360] using h
                                 · by_cases h384 : T < 384
-                                  · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, L23, Nat.log] using fiveAnnulus_360_subset_bound_bool
+                                  · have hSub' : S.Subset (FiveAnnulusList 360) := by
+                                      simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384] using hSub
+                                    have h := gammaFree_fiveAnnulus_360_deficit_three hGamma hSub'
+                                    simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384] using h
                                   · by_cases h405 : T < 405
-                                    · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, L23, Nat.log] using fiveAnnulus_384_subset_bound_bool
+                                    · have hSub' : S.Subset (FiveAnnulusList 384) := by
+                                        simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405] using hSub
+                                      have h := gammaFree_fiveAnnulus_384_deficit_three hGamma hSub'
+                                      simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405] using h
                                     · by_cases h432 : T < 432
-                                      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, L23, Nat.log] using fiveAnnulus_405_subset_bound_bool
+                                      · have hSub' : S.Subset (FiveAnnulusList 405) := by
+                                          simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432] using hSub
+                                        have h := gammaFree_fiveAnnulus_405_deficit_three hGamma hSub'
+                                        simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432] using h
                                       · by_cases h480 : T < 480
-                                        · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, L23, Nat.log] using fiveAnnulus_432_subset_bound_bool
+                                        · have hSub' : S.Subset (FiveAnnulusList 432) := by
+                                            simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480] using hSub
+                                          have h := gammaFree_fiveAnnulus_432_deficit_three hGamma hSub'
+                                          simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480] using h
                                         · by_cases h486 : T < 486
-                                          · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, L23, Nat.log] using fiveAnnulus_480_subset_bound_bool
+                                          · have hSub' : S.Subset (FiveAnnulusList 480) := by
+                                              simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486] using hSub
+                                            have h := gammaFree_fiveAnnulus_480_deficit_three hGamma hSub'
+                                            simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486] using h
                                           · by_cases h512 : T < 512
-                                            · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, L23, Nat.log] using fiveAnnulus_486_subset_bound_bool
+                                            · have hSub' : S.Subset (FiveAnnulusList 486) := by
+                                                simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512] using hSub
+                                              have h := gammaFree_fiveAnnulus_486_deficit_three hGamma hSub'
+                                              simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512] using h
                                             · by_cases h540 : T < 540
-                                              · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, L23, Nat.log] using fiveAnnulus_512_subset_bound_bool
+                                              · have hSub' : S.Subset (FiveAnnulusList 512) := by
+                                                  simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540] using hSub
+                                                have h := gammaFree_fiveAnnulus_512_deficit_three hGamma hSub'
+                                                simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540] using h
                                               · by_cases h576 : T < 576
-                                                · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, L23, Nat.log] using fiveAnnulus_540_subset_bound_bool
+                                                · have hSub' : S.Subset (FiveAnnulusList 540) := by
+                                                    simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576] using hSub
+                                                  have h := gammaFree_fiveAnnulus_540_deficit_three hGamma hSub'
+                                                  simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576] using h
                                                 · by_cases h640 : T < 640
-                                                  · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, L23, Nat.log] using fiveAnnulus_576_subset_bound_bool
+                                                  · have hSub' : S.Subset (FiveAnnulusList 576) := by
+                                                      simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640] using hSub
+                                                    have h := gammaFree_fiveAnnulus_576_deficit_three hGamma hSub'
+                                                    simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640] using h
                                                   · by_cases h648 : T < 648
-                                                    · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, L23, Nat.log] using fiveAnnulus_640_subset_bound_bool
+                                                    · have hSub' : S.Subset (FiveAnnulusList 640) := by
+                                                        simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648] using hSub
+                                                      have h := gammaFree_fiveAnnulus_640_deficit_three hGamma hSub'
+                                                      simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648] using h
                                                     · by_cases h720 : T < 720
-                                                      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720, L23, Nat.log] using fiveAnnulus_648_subset_bound_bool
-                                                      · simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720, L23, Nat.log] using fiveAnnulus_720_subset_bound_bool
-
+                                                      · have hSub' : S.Subset (FiveAnnulusList 648) := by
+                                                          simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720] using hSub
+                                                        have h := gammaFree_fiveAnnulus_648_deficit_three hGamma hSub'
+                                                        simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720] using h
+                                                      · have hSub' : S.Subset (FiveAnnulusList 720) := by
+                                                          simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720] using hSub
+                                                        have h := gammaFree_fiveAnnulus_720_deficit_three hGamma hSub'
+                                                        simpa [FiniteAnnulusRepresentative, h128, h135, h144, h160, h162, h180, h192, h216, h240, h243, h256, h270, h288, h320, h324, h360, h384, h405, h432, h480, h486, h512, h540, h576, h640, h648, h720] using h
 
 /--
-On the whole finite range, `T` and its representative have exactly the same
-annulus list and the same logarithmic baseline.
+For every `120 ≤ T ≤ 728`, the small annulus board and the logarithmic
+baseline agree exactly with those at the chosen critical representative.
+Because the board has only 60 possible grid points, this finite kernel check
+is inexpensive.
 -/
-theorem finiteAnnulusRepresentative_data
+set_option maxHeartbeats 1000000 in
+theorem finiteAnnulusRepresentative_small_data
     {T : Nat}
     (hLow : 120 ≤ T)
     (hHigh : T ≤ 728) :
-    FiveAnnulusList T =
-        FiveAnnulusList (FiniteAnnulusRepresentative T) ∧
+    SmallFiveAnnulusList T =
+        SmallFiveAnnulusList (FiniteAnnulusRepresentative T) ∧
       L23 T = L23 (FiniteAnnulusRepresentative T) := by
   interval_cases T <;> native_decide
 
 /--
-Uniform finite annulus lemma: every Gamma-free annulus family has deficit at
-least three throughout `120 ≤ T ≤ 728`.
+Uniform finite annulus lemma on `120 ≤ T ≤ 728`.
 -/
 theorem gammaFree_annulus_finite_deficit_three
     {T : Nat}
@@ -2615,37 +2777,62 @@ theorem gammaFree_annulus_finite_deficit_three
     (hHigh : T ≤ 728)
     {S : List Erdos536.GridPoint}
     (hGamma : Erdos536.GammaFree S)
-    (hSAnn :
-      ∀ p ∈ S, InFiveAnnulus T p) :
+    (hSAnn : ∀ p ∈ S, InFiveAnnulus T p) :
     S.length + 3 ≤ L23 T := by
-  have hData := finiteAnnulusRepresentative_data hLow hHigh
-  have hSubT : S.Subset (FiveAnnulusList T) := by
+  have hData :=
+    finiteAnnulusRepresentative_small_data hLow hHigh
+  have hSubSmallT : S.Subset (SmallFiveAnnulusList T) := by
     intro p hp
-    exact (mem_fiveAnnulusList).2 (hSAnn p hp)
-  have hSubR :
-      S.Subset (FiveAnnulusList (FiniteAnnulusRepresentative T)) := by
+    exact (mem_smallFiveAnnulusList hHigh).2 (hSAnn p hp)
+  have hSubSmallR :
+      S.Subset (SmallFiveAnnulusList (FiniteAnnulusRepresentative T)) := by
     intro p hp
     rw [← hData.1]
-    exact hSubT hp
-  have hCert :=
-    finiteAnnulusRepresentative_subset_bound_bool T
-  have hLen :
-      S.length ≤ L23 (FiniteAnnulusRepresentative T) - 3 := by
-    exact gammaFree_length_le_of_subsetBoundBool
-      hCert hGamma hSubR
-  have hLog2 : 1 ≤ Nat.log 2 T := by
-    apply Nat.le_log_of_pow_le (by decide : 1 < (2 : Nat))
-    norm_num
-    omega
-  have hLog3 : 1 ≤ Nat.log 3 T := by
-    apply Nat.le_log_of_pow_le (by decide : 1 < (3 : Nat))
-    norm_num
-    omega
-  have hBaseT : 3 ≤ L23 T := by
-    unfold L23
-    omega
-  have hBaseR : 3 ≤ L23 (FiniteAnnulusRepresentative T) := by
-    omega
-  omega
+    exact hSubSmallT hp
+  have hSubBigR :
+      S.Subset (FiveAnnulusList (FiniteAnnulusRepresentative T)) := by
+    intro p hp
+    apply (mem_fiveAnnulusList).2
+    rcases List.mem_filter.mp hp with ⟨_, hAnn⟩
+    simpa using hAnn
+  have hRep :=
+    gammaFree_representative_deficit_three T hGamma hSubBigR
+  rw [hData.2]
+  exact hRep
+
+/-!
+## Strong annulus lemma for every `T ≥ 120`
+-/
+
+/--
+Every Gamma-free family contained in the five-annulus at scale `T ≥ 120`
+has deficit at least three relative to `L23 T`.
+-/
+theorem gammaFree_annulus_deficit_three
+    {T : Nat}
+    (hT : 120 ≤ T)
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSAnn : ∀ p ∈ S, InFiveAnnulus T p) :
+    S.length + 3 ≤ L23 T := by
+  by_cases hFinite : T ≤ 728
+  · exact gammaFree_annulus_finite_deficit_three
+      hT hFinite hGamma hSAnn
+  · have hLarge : 729 ≤ T := by
+      omega
+    exact gammaFree_annulus_large_deficit_three
+      hLarge hGamma hSAnn
+
+/-- List-subset formulation of the strong annulus lemma. -/
+theorem gammaFree_subset_fiveAnnulus_deficit_three
+    {T : Nat}
+    (hT : 120 ≤ T)
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList T)) :
+    S.length + 3 ≤ L23 T := by
+  apply gammaFree_annulus_deficit_three hT hGamma
+  intro p hp
+  exact (mem_fiveAnnulusList).1 (hSub hp)
 
 end Erdos536813
