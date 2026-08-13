@@ -36,25 +36,25 @@ The ten critical states are
 ## Proof structure
 
 1. Write each integer uniquely as
-   \[
+   $`
    n=m2^i3^j5^k,\qquad (m,30)=1.
-   \]
-2. For fixed \(m,k\), selected integers form a \(\Gamma\)-free subset of
-   \[
+   `$
+2. For fixed $`m,k`$, selected integers form a $`\Gamma`$-free subset of
+   $`
    D(T)=\{(i,j):2^i3^j\le T\}.
-   \]
+   `$
 3. The usual projection bound gives
-   \[
+   $`
    |F_k|\le L(T_k)=\lfloor\log_2T_k\rfloor+\lfloor\log_3T_k\rfloor+1,
-   \]
-   whose global sum recovers the known \(5/6\) bound.
-4. A blocking lemma couples adjacent \(5\)-adic slices: an extremal upper slice blocks all nontrivial \(2,3\)-smooth points in the lower inner region.
+   `$
+   whose global sum recovers the known $`5/6`$ bound.
+4. A blocking lemma couples adjacent $`5`$-adic slices: an extremal upper slice blocks all nontrivial $`2,3`$-smooth points in the lower inner region.
 5. An annulus bound gives additional deficit in the lower slice.
 6. Exact finite verification strengthens the two-layer deficit on specified small ranges.
-7. Summing forced deficits gives weighted deficit \(61/800\). Since \(m\) coprime to 30 have density \(4/15\),
-   \[
+7. Summing forced deficits gives weighted deficit $`61/800`$. Since $`m`$ coprime to 30 have density $`4/15`$,
+   $`
    \frac56-\frac4{15}\frac{61}{800}=\frac{813}{1000}.
-   \]
+   `$
 
 See `notes/proof_outline.md` for a more detailed proof outline.
 
