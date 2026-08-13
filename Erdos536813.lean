@@ -1819,45 +1819,52 @@ theorem gammaFree_subset_fiveAnnulus_large_deficit_three
 /-!
 ## Executable finite Gamma-freeness checker
 
-The remaining annulus range `120 ≤ T ≤ 728` is finite.  To certify it
-inside Lean with `native_decide`, we first package Gamma-freeness as an
-explicit Boolean computation on a finite list and prove that this Boolean
-checker is equivalent to the mathematical `GammaFree` predicate.
+The remaining annulus range `120 ≤ T ≤ 728` is finite.  We use an explicit
+Boolean implementation of the four coordinate conditions defining a
+Gamma-pattern, rather than asking typeclass inference for decidability of the
+imported proposition.
 -/
 
+/-- Executable Boolean version of `Erdos536.GammaPattern`. -/
+def GammaPatternBool
+    (top left down : Erdos536.GridPoint) : Bool :=
+  decide (left.j = top.j) &&
+    decide (left.i < top.i) &&
+    decide (down.i = top.i) &&
+    decide (down.j < top.j)
+
+/-- The Boolean Gamma-pattern test is exactly the mathematical predicate. -/
+theorem gammaPatternBool_eq_true_iff
+    (top left down : Erdos536.GridPoint) :
+    GammaPatternBool top left down = true ↔
+      Erdos536.GammaPattern top left down := by
+  simp [GammaPatternBool, Erdos536.GammaPattern]
+
 /--
-Executable check that no ordered triple of elements of `S` forms a
-Gamma-pattern.  `Nodup` is checked separately because it is part of the
-definition of `GammaFree`.
+Executable check that a finite list is nodup and contains no Gamma-pattern.
 -/
 def GammaFreeFiniteBool (S : List Erdos536.GridPoint) : Bool :=
   decide S.Nodup &&
     S.all (fun top =>
       S.all (fun left =>
         S.all (fun down =>
-          decide (¬ Erdos536.GammaPattern top left down))))
+          ! GammaPatternBool top left down)))
 
-/--
-The executable checker exactly matches `Erdos536.GammaFree`.
--/
+/-- The executable checker exactly matches `Erdos536.GammaFree`. -/
 theorem gammaFreeFiniteBool_eq_true_iff
     (S : List Erdos536.GridPoint) :
     GammaFreeFiniteBool S = true ↔ Erdos536.GammaFree S := by
-  simp [GammaFreeFiniteBool, Erdos536.GammaFree]
+  simp [GammaFreeFiniteBool, GammaPatternBool,
+    Erdos536.GammaFree, Erdos536.GammaPattern]
 
-/--
-Soundness form convenient for computational certificates.
--/
+/-- Soundness form convenient for computational certificates. -/
 theorem gammaFree_of_gammaFreeFiniteBool
     {S : List Erdos536.GridPoint}
     (h : GammaFreeFiniteBool S = true) :
     Erdos536.GammaFree S :=
   (gammaFreeFiniteBool_eq_true_iff S).1 h
 
-/--
-Completeness form convenient when turning a mathematical Gamma-free family
-into input for a Boolean finite checker.
--/
+/-- Completeness form convenient for computational certificates. -/
 theorem gammaFreeFiniteBool_of_gammaFree
     {S : List Erdos536.GridPoint}
     (h : Erdos536.GammaFree S) :
