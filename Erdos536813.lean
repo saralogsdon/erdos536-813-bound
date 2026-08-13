@@ -1981,4 +1981,39 @@ example :
       2 = true := by
   native_decide
 
+
+/-!
+## First concrete finite annulus certificate: `T = 120`
+
+At `T = 120`,
+`L23 120 = floor(log_2 120) + floor(log_3 120) + 1 = 11`,
+and the exact annulus maximum is at most `8`.
+Thus every Gamma-free annulus family has deficit at least three.
+-/
+
+/-- Exhaustive kernel computation for the annulus at `T = 120`. -/
+theorem fiveAnnulus_120_subset_bound_bool :
+    GammaFreeSubsetBoundBool (FiveAnnulusList 120) 8 = true := by
+  native_decide
+
+/-- Every Gamma-free subset of the `T = 120` annulus has size at most `8`. -/
+theorem gammaFree_fiveAnnulus_120_length_le_eight
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 120)) :
+    S.length ≤ 8 := by
+  exact gammaFree_length_le_of_subsetBoundBool
+    fiveAnnulus_120_subset_bound_bool hGamma hSub
+
+/-- The `T = 120` annulus has deficit at least three relative to `L23 120`. -/
+theorem gammaFree_fiveAnnulus_120_deficit_three
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList 120)) :
+    S.length + 3 ≤ L23 120 := by
+  have hLen : S.length ≤ 8 :=
+    gammaFree_fiveAnnulus_120_length_le_eight hGamma hSub
+  norm_num [L23, Nat.log]
+  omega
+
 end Erdos536813
