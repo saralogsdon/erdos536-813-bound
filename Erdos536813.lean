@@ -1148,4 +1148,118 @@ theorem selectedAnnulusDoubleColumns_top_j_drop_at_least_two
     hPattern
 
 
+
+/-!
+## Counting separated double-column endpoints
+
+The geometric lemma above says that, when double columns are ordered by
+increasing 2-exponent, their top 3-exponents strictly descend with gaps at
+least two.  The next ingredient is the elementary counting fact for such
+a sequence.
+-/
+
+/--
+A list of natural numbers whose successive entries decrease by at least 2.
+-/
+def TwoSeparatedDescending : List Nat → Prop
+  | [] => True
+  | [_] => True
+  | a :: b :: xs =>
+      b + 2 ≤ a ∧ TwoSeparatedDescending (b :: xs)
+
+/--
+For a nonempty two-separated descending list `a :: xs`, the first entry
+dominates twice the length of the tail.
+-/
+theorem twoSeparatedDescending_two_mul_tail_length_le_head
+    {a : Nat}
+    {xs : List Nat}
+    (hSep : TwoSeparatedDescending (a :: xs)) :
+    2 * xs.length ≤ a := by
+  induction xs generalizing a with
+  | nil =>
+      simp
+  | cons b xs ih =>
+      have hGap : b + 2 ≤ a := by
+        simpa [TwoSeparatedDescending] using hSep.1
+      have hTail : TwoSeparatedDescending (b :: xs) := by
+        simpa [TwoSeparatedDescending] using hSep.2
+      have hIH : 2 * xs.length ≤ b :=
+        ih hTail
+      simp only [List.length_cons]
+      omega
+
+/--
+If the first entry of a two-separated descending list is at most `J`, then
+the list has at most `J / 2 + 1` entries.
+
+This is the integer form of the `ceil((J+1)/2)` bound used for the number
+of double columns.
+-/
+theorem twoSeparatedDescending_length_le_half_plus_one
+    {a J : Nat}
+    {xs : List Nat}
+    (hSep : TwoSeparatedDescending (a :: xs))
+    (haJ : a ≤ J) :
+    (a :: xs).length ≤ J / 2 + 1 := by
+  have hTail :
+      2 * xs.length ≤ a :=
+    twoSeparatedDescending_two_mul_tail_length_le_head hSep
+  simp only [List.length_cons]
+  omega
+
+
+/--
+Sharper form when every endpoint is positive.  This is the form needed for
+double columns, because a double column has a lower point one step below its
+top, so its top 3-exponent is at least 1.
+-/
+theorem twoSeparatedDescending_two_mul_tail_length_add_one_le_head
+    {a : Nat}
+    {xs : List Nat}
+    (hSep : TwoSeparatedDescending (a :: xs))
+    (hPos : ∀ x ∈ a :: xs, 1 ≤ x) :
+    2 * xs.length + 1 ≤ a := by
+  induction xs generalizing a with
+  | nil =>
+      simpa using hPos a (by simp)
+  | cons b xs ih =>
+      have hGap : b + 2 ≤ a := by
+        simpa [TwoSeparatedDescending] using hSep.1
+      have hTail : TwoSeparatedDescending (b :: xs) := by
+        simpa [TwoSeparatedDescending] using hSep.2
+      have hPosTail : ∀ x ∈ b :: xs, 1 ≤ x := by
+        intro x hx
+        exact hPos x (by simp [hx])
+      have hIH : 2 * xs.length + 1 ≤ b :=
+        ih hTail hPosTail
+      simp only [List.length_cons]
+      omega
+
+/--
+Positive separated endpoints bounded above by `J` have cardinality at most
+`(J + 1) / 2 = ceil(J/2)`.
+-/
+theorem positive_twoSeparatedDescending_length_le_ceiling_half
+    {a J : Nat}
+    {xs : List Nat}
+    (hSep : TwoSeparatedDescending (a :: xs))
+    (hPos : ∀ x ∈ a :: xs, 1 ≤ x)
+    (haJ : a ≤ J) :
+    (a :: xs).length ≤ (J + 1) / 2 := by
+  have hSharp :
+      2 * xs.length + 1 ≤ a :=
+    twoSeparatedDescending_two_mul_tail_length_add_one_le_head hSep hPos
+  simp only [List.length_cons]
+  omega
+
+/--
+Equivalent ceiling-style arithmetic identity:
+`J / 2 + 1 = (J + 2) / 2`.
+-/
+theorem half_plus_one_eq_add_two_div_two
+    (J : Nat) :
+    J / 2 + 1 = (J + 2) / 2 := by
+  omega
+
 end Erdos536813
