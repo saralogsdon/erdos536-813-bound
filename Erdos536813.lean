@@ -1854,9 +1854,31 @@ def GammaFreeFiniteBool (S : List Erdos536.GridPoint) : Bool :=
 theorem gammaFreeFiniteBool_eq_true_iff
     (S : List Erdos536.GridPoint) :
     GammaFreeFiniteBool S = true ↔ Erdos536.GammaFree S := by
-  simp [GammaFreeFiniteBool, GammaPatternBool,
-    Erdos536.GammaFree, Erdos536.GammaPattern, and_assoc]
-  aesop
+  constructor
+  · intro h
+    have h' :
+        S.Nodup ∧
+          ∀ top ∈ S, ∀ left ∈ S, ∀ down ∈ S,
+            GammaPatternBool top left down = false := by
+      simpa [GammaFreeFiniteBool] using h
+    refine ⟨h'.1, ?_⟩
+    intro top hTop left hLeft down hDown hPat
+    have hTrue : GammaPatternBool top left down = true :=
+      (gammaPatternBool_eq_true_iff top left down).2 hPat
+    have hFalse := h'.2 top hTop left hLeft down hDown
+    simp [hTrue] at hFalse
+  · intro h
+    have hNo :
+        ∀ top ∈ S, ∀ left ∈ S, ∀ down ∈ S,
+          GammaPatternBool top left down = false := by
+      intro top hTop left hLeft down hDown
+      cases hBool : GammaPatternBool top left down with
+      | false => rfl
+      | true =>
+          exfalso
+          exact h.2 top hTop left hLeft down hDown
+            ((gammaPatternBool_eq_true_iff top left down).1 hBool)
+    simpa [GammaFreeFiniteBool] using And.intro h.1 hNo
 
 /-- Soundness form convenient for computational certificates. -/
 theorem gammaFree_of_gammaFreeFiniteBool
