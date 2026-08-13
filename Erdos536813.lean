@@ -1023,4 +1023,129 @@ theorem fiveAnnulus_same_i_three_points_not_pairwise_distinct
     cases r
     simp_all
 
+
+/--
+A selected double column in the factor-5 annulus: `top` and `down` are
+selected annulus points with the same 2-exponent and consecutive
+3-exponents.
+-/
+def IsSelectedAnnulusDoubleColumn
+    (T : Nat)
+    (S : List Erdos536.GridPoint)
+    (top down : Erdos536.GridPoint) : Prop :=
+  top ∈ S ∧
+    down ∈ S ∧
+    InFiveAnnulus T top ∧
+    InFiveAnnulus T down ∧
+    top.i = down.i ∧
+    down.j + 1 = top.j
+
+/--
+If both exponents increase by at least one, the corresponding 2,3-smooth
+value increases by at least a factor of six.
+-/
+theorem six_mul_fiberValue_le_of_both_exponents_increase
+    {p q : Erdos536.GridPoint}
+    (hi : p.i + 1 ≤ q.i)
+    (hj : p.j + 1 ≤ q.j) :
+    6 * Erdos536.fiberValue 1 p ≤ Erdos536.fiberValue 1 q := by
+  have hPow2 : 2 ^ (p.i + 1) ≤ 2 ^ q.i :=
+    Nat.pow_le_pow_right (by decide : 0 < (2 : Nat)) hi
+  have hPow3 : 3 ^ (p.j + 1) ≤ 3 ^ q.j :=
+    Nat.pow_le_pow_right (by decide : 0 < (3 : Nat)) hj
+  calc
+    6 * Erdos536.fiberValue 1 p
+        = 2 ^ (p.i + 1) * 3 ^ (p.j + 1) := by
+            simp only [Erdos536.fiberValue, one_mul, pow_add]
+            ring
+    _ ≤ 2 ^ q.i * 3 ^ q.j := Nat.mul_le_mul hPow2 hPow3
+    _ = Erdos536.fiberValue 1 q := by
+      simp [Erdos536.fiberValue]
+
+/--
+The upper endpoints of two selected double columns cannot stay level or
+increase as the 2-exponent increases.
+
+The factor-5 window already forces a strict drop: otherwise the lower point
+of the earlier double column and the upper point of the later double column
+would differ by a factor of at least 6, impossible inside a multiplicative
+window of width 5.
+-/
+theorem selectedAnnulusDoubleColumns_top_j_strictly_decrease
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    {pTop pDown qTop qDown : Erdos536.GridPoint}
+    (hP : IsSelectedAnnulusDoubleColumn T S pTop pDown)
+    (hQ : IsSelectedAnnulusDoubleColumn T S qTop qDown)
+    (hi : pTop.i < qTop.i) :
+    qTop.j < pTop.j := by
+  rcases hP with ⟨_hpTopS, _hpDownS, _hpTopAnn, hpDownAnn,
+    hpSameI, hpConsecJ⟩
+  rcases hQ with ⟨_hqTopS, _hqDownS, hqTopAnn, _hqDownAnn,
+    _hqSameI, _hqConsecJ⟩
+  by_contra hNot
+  have hjOrder : pTop.j ≤ qTop.j := by omega
+  have hiInc : pDown.i + 1 ≤ qTop.i := by
+    rw [← hpSameI]
+    omega
+  have hjInc : pDown.j + 1 ≤ qTop.j := by
+    rw [hpConsecJ]
+    exact hjOrder
+  have hSix :
+      6 * Erdos536.fiberValue 1 pDown ≤
+        Erdos536.fiberValue 1 qTop :=
+    six_mul_fiberValue_le_of_both_exponents_increase hiInc hjInc
+  exact factor_five_window_forbids_sixfold
+    hpDownAnn.2 hqTopAnn.1 hSix
+
+/--
+Key nonconsecutivity lemma for the large-scale annulus argument.
+
+For two selected double columns, ordered by increasing 2-exponent, the
+upper 3-exponent drops by at least two.  A drop of zero is impossible by
+the factor-5 window; a drop of exactly one would make the lower point of
+the earlier column a left arm for the later column, producing a Gamma.
+-/
+theorem selectedAnnulusDoubleColumns_top_j_drop_at_least_two
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    {pTop pDown qTop qDown : Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hP : IsSelectedAnnulusDoubleColumn T S pTop pDown)
+    (hQ : IsSelectedAnnulusDoubleColumn T S qTop qDown)
+    (hi : pTop.i < qTop.i) :
+    qTop.j + 2 ≤ pTop.j := by
+  rcases hP with ⟨hpTopS, hpDownS, hpTopAnn, hpDownAnn,
+    hpSameI, hpConsecJ⟩
+  rcases hQ with ⟨hqTopS, hqDownS, hqTopAnn, hqDownAnn,
+    hqSameI, hqConsecJ⟩
+
+  have hStrict : qTop.j < pTop.j := by
+    apply selectedAnnulusDoubleColumns_top_j_strictly_decrease
+      (T := T) (S := S)
+      (pTop := pTop) (pDown := pDown)
+      (qTop := qTop) (qDown := qDown)
+    · exact ⟨hpTopS, hpDownS, hpTopAnn, hpDownAnn, hpSameI, hpConsecJ⟩
+    · exact ⟨hqTopS, hqDownS, hqTopAnn, hqDownAnn, hqSameI, hqConsecJ⟩
+    · exact hi
+
+  by_contra hNotTwo
+  have hOne : pTop.j = qTop.j + 1 := by omega
+  have hSameRow : pDown.j = qTop.j := by omega
+  have hLeftI : pDown.i < qTop.i := by
+    rw [← hpSameI]
+    exact hi
+  have hDownI : qDown.i = qTop.i := hqSameI.symm
+  have hDownJ : qDown.j < qTop.j := by omega
+
+  have hPattern : Erdos536.GammaPattern qTop pDown qDown := by
+    exact ⟨hSameRow, hLeftI, hDownI, hDownJ⟩
+
+  exact hGamma.2
+    qTop hqTopS
+    pDown hpDownS
+    qDown hqDownS
+    hPattern
+
+
 end Erdos536813
