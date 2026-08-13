@@ -3,11 +3,11 @@
 This repository contains a **candidate computer-assisted improvement** for Erdős Problem #536.
 
 For
-\[
+\(
 f(N)=\max\{|A|:A\subseteq\{1,\dots,N\},\; A\text{ contains no three distinct }a,b,c\text{ with }[a,b]=[a,c]=[b,c]\},
-\]
+\)
 the candidate result is
-\[
+\]
 f(N)\le \left(\frac{813}{1000}+o(1)\right)N.
 \]
 
