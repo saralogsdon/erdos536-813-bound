@@ -1919,7 +1919,7 @@ permutation, checking all sublists is sufficient.
 /-- Gamma-freeness depends only on the underlying finite set, not list order. -/
 theorem gammaFree_of_perm
     {S U : List Erdos536.GridPoint}
-    (hPerm : U ~ S)
+    (hPerm : List.Perm U S)
     (hS : Erdos536.GammaFree S) :
     Erdos536.GammaFree U := by
   constructor
@@ -1953,7 +1953,7 @@ theorem gammaFree_length_le_of_subsetBoundBool
     (hGamma : Erdos536.GammaFree S)
     (hSub : S.Subset D) :
     S.length ≤ B := by
-  have hSubperm : S <+~ D :=
+  have hSubperm : List.Subperm S D :=
     hGamma.1.subperm hSub
   rcases hSubperm with ⟨U, hPerm, hUSub⟩
   have hUMem : U ∈ D.sublists := by
