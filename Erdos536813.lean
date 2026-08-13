@@ -757,4 +757,108 @@ theorem maximumGammaFree_blocks_every_nontrivial_lower_point
   exact maximalGammaFree_blocks_every_nontrivial_lower_point
     hq hA hMaximal hUpperSelected hOriginS hcD hcNontrivial
 
+
+/-!
+## The factor-5 annulus
+
+The blocking lemma says that, when the upper 5-adic slice is extremal,
+the adjacent lower slice can contain no nontrivial point from the inner
+board.  What remains is the multiplicative annulus
+
+    T/5 < 2^i 3^j ≤ T.
+
+For natural-number bookkeeping it is convenient to encode the lower
+inequality without division as
+
+    T < 5 * (2^i 3^j).
+
+This is the same factor-5 window that is used in the hand proof.
+-/
+
+/-- Membership in the factor-5 annulus at scale `T`. -/
+def InFiveAnnulus
+    (T : Nat)
+    (p : Erdos536.GridPoint) : Prop :=
+  Erdos536.fiberValue 1 p ≤ T ∧
+    T < 5 * Erdos536.fiberValue 1 p
+
+/--
+Finite list of all 2,3-smooth exponent points in the factor-5 annulus.
+We obtain it by filtering Kenta's complete fiber-region list.
+-/
+def FiveAnnulusList (T : Nat) : List Erdos536.GridPoint :=
+  (Erdos536.FiberRegionList 1 T).filter
+    (fun p => decide (T < 5 * Erdos536.fiberValue 1 p))
+
+/-- The finite annulus list has no duplicate grid points. -/
+theorem fiveAnnulusList_nodup (T : Nat) :
+    (FiveAnnulusList T).Nodup := by
+  exact
+    (Erdos536.fiberRegionList_nodup 1 T).filter
+      (fun p => decide (T < 5 * Erdos536.fiberValue 1 p))
+
+/-- Exact membership characterization of the finite annulus list. -/
+theorem mem_fiveAnnulusList
+    {T : Nat}
+    {p : Erdos536.GridPoint} :
+    p ∈ FiveAnnulusList T ↔ InFiveAnnulus T p := by
+  constructor
+  · intro hp
+    rcases List.mem_filter.mp hp with ⟨hpRegion, hpWindow⟩
+    have hpUpper : Erdos536.fiberValue 1 p ≤ T :=
+      (Erdos536.fiberRegionList_complete
+        (m := 1) (N := T) (by decide : 0 < (1 : Nat)) p).1 hpRegion
+    exact ⟨hpUpper, by simpa using hpWindow⟩
+  · intro hp
+    rcases hp with ⟨hpUpper, hpWindow⟩
+    apply List.mem_filter.mpr
+    constructor
+    · exact
+        (Erdos536.fiberRegionList_complete
+          (m := 1) (N := T) (by decide : 0 < (1 : Nat)) p).2 hpUpper
+    · simpa using hpWindow
+
+/-- Every annulus point lies in the ordinary fiber region at scale `T`. -/
+theorem fiveAnnulusList_subset_fiberRegion (T : Nat) :
+    (FiveAnnulusList T).Subset (Erdos536.FiberRegionList 1 T) := by
+  intro p hp
+  exact (List.mem_filter.mp hp).1
+
+/--
+For `T ≥ 5`, the origin is not in the factor-5 annulus.
+This is the formal version of the fact that the blocking theorem leaves
+the origin as one exceptional lower-slice point, separate from the annulus.
+-/
+theorem gridOrigin_not_mem_fiveAnnulus
+    {T : Nat}
+    (hT : 5 ≤ T) :
+    gridOrigin ∉ FiveAnnulusList T := by
+  intro hOrigin
+  have hAnn : InFiveAnnulus T gridOrigin :=
+    (mem_fiveAnnulusList).1 hOrigin
+  rcases hAnn with ⟨_hUpper, hWindow⟩
+  simp [gridOrigin, Erdos536.fiberValue] at hWindow
+  omega
+
+/-- Every point in the factor-5 annulus has positive 2,3-smooth value. -/
+theorem fiveAnnulus_value_pos
+    {T : Nat}
+    {p : Erdos536.GridPoint}
+    (_hp : InFiveAnnulus T p) :
+    0 < Erdos536.fiberValue 1 p := by
+  simp [Erdos536.fiberValue]
+
+/--
+Pure arithmetic form of the factor-5 obstruction: a number in the annulus
+cannot coexist below `T` with another number at least six times as large.
+The large-scale row/column spacing lemmas will reduce to this statement.
+-/
+theorem factor_five_window_forbids_sixfold
+    {T x y : Nat}
+    (hWindow : T < 5 * x)
+    (hyT : y ≤ T)
+    (hSix : 6 * x ≤ y) :
+    False := by
+  omega
+
 end Erdos536813
