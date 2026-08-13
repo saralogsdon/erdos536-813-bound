@@ -5,9 +5,9 @@ This repository contains a **candidate computer-assisted improvement** for Erdő
 For
 $` f(N)=\max\{|A|:A\subseteq\{1,\dots,N\},\; A\text{ contains no three distinct }a,b,c\text{ with }[a,b]=[a,c]=[b,c]\},`$
 the candidate result is
-$'f(N)\le \left(\frac{813}{1000}+o(1)\right)N.'$
+$`f(N)\le \left(\frac{813}{1000}+o(1)\right)N.`$
 
-This improves the currently recorded coefficient $5/6\approx0.833333$ to $0.813$, **provided the proof and finite verification survive independent review**.
+This improves the currently recorded coefficient $`5/6\approx0.833333`$ to $`0.813`$, **provided the proof and finite verification survive independent review**.
 
 ## Status
 
