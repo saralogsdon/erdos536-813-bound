@@ -2808,8 +2808,11 @@ theorem gammaFree_annulus_finite_deficit_three
   have hSubBigR :
       S.Subset (FiveAnnulusList (FiniteAnnulusRepresentative T)) := by
     intro p hp
+    have hpSmall :
+        p ∈ SmallFiveAnnulusList (FiniteAnnulusRepresentative T) :=
+      hSubSmallR hp
     apply (mem_fiveAnnulusList).2
-    rcases List.mem_filter.mp hp with ⟨_, hAnnBool⟩
+    rcases List.mem_filter.mp hpSmall with ⟨_, hAnnBool⟩
     exact (inFiveAnnulusBool_eq_true_iff
       (FiniteAnnulusRepresentative T) p).1 hAnnBool
   have hRep :=
