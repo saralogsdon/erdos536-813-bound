@@ -1815,4 +1815,64 @@ theorem gammaFree_subset_fiveAnnulus_large_deficit_three
   intro p hp
   exact (mem_fiveAnnulusList).1 (hSub hp)
 
+
+/-!
+## Executable finite Gamma-freeness checker
+
+The remaining annulus range `120 ≤ T ≤ 728` is finite.  To certify it
+inside Lean with `native_decide`, we first package Gamma-freeness as an
+explicit Boolean computation on a finite list and prove that this Boolean
+checker is equivalent to the mathematical `GammaFree` predicate.
+-/
+
+/--
+Executable check that no ordered triple of elements of `S` forms a
+Gamma-pattern.  `Nodup` is checked separately because it is part of the
+definition of `GammaFree`.
+-/
+def GammaFreeFiniteBool (S : List Erdos536.GridPoint) : Bool :=
+  decide S.Nodup &&
+    S.all (fun top =>
+      S.all (fun left =>
+        S.all (fun down =>
+          decide (¬ Erdos536.GammaPattern top left down))))
+
+/--
+The executable checker exactly matches `Erdos536.GammaFree`.
+-/
+theorem gammaFreeFiniteBool_eq_true_iff
+    (S : List Erdos536.GridPoint) :
+    GammaFreeFiniteBool S = true ↔ Erdos536.GammaFree S := by
+  simp [GammaFreeFiniteBool, Erdos536.GammaFree]
+
+/--
+Soundness form convenient for computational certificates.
+-/
+theorem gammaFree_of_gammaFreeFiniteBool
+    {S : List Erdos536.GridPoint}
+    (h : GammaFreeFiniteBool S = true) :
+    Erdos536.GammaFree S :=
+  (gammaFreeFiniteBool_eq_true_iff S).1 h
+
+/--
+Completeness form convenient when turning a mathematical Gamma-free family
+into input for a Boolean finite checker.
+-/
+theorem gammaFreeFiniteBool_of_gammaFree
+    {S : List Erdos536.GridPoint}
+    (h : Erdos536.GammaFree S) :
+    GammaFreeFiniteBool S = true :=
+  (gammaFreeFiniteBool_eq_true_iff S).2 h
+
+/-- Basic kernel-checked sanity checks for the executable predicate. -/
+example : GammaFreeFiniteBool ([] : List Erdos536.GridPoint) = true := by
+  native_decide
+
+example :
+    GammaFreeFiniteBool
+      [({ i := 1, j := 1 } : Erdos536.GridPoint),
+       ({ i := 0, j := 1 } : Erdos536.GridPoint),
+       ({ i := 1, j := 0 } : Erdos536.GridPoint)] = false := by
+  native_decide
+
 end Erdos536813
