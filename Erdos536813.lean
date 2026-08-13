@@ -1262,4 +1262,141 @@ theorem half_plus_one_eq_add_two_div_two
     J / 2 + 1 = (J + 2) / 2 := by
   omega
 
+
+/-!
+## Ordered enumeration of selected double columns
+
+We now connect the geometric double-column separation theorem to the
+abstract separated-endpoint counting lemma.
+-/
+
+/--
+An ordered list of the top points of selected double columns.
+
+The list is ordered by strictly increasing 2-exponent.  Each listed top
+comes with a selected lower point making a genuine double column.
+-/
+def OrderedSelectedDoubleTops
+    (T : Nat)
+    (S : List Erdos536.GridPoint) :
+    List Erdos536.GridPoint → Prop
+  | [] => True
+  | [p] =>
+      ∃ down, IsSelectedAnnulusDoubleColumn T S p down
+  | p :: q :: xs =>
+      (∃ pDown qDown,
+        IsSelectedAnnulusDoubleColumn T S p pDown ∧
+        IsSelectedAnnulusDoubleColumn T S q qDown ∧
+        p.i < q.i) ∧
+      OrderedSelectedDoubleTops T S (q :: xs)
+
+/--
+Every point in an ordered double-top list really is the top of a selected
+double column.
+-/
+theorem orderedSelectedDoubleTops_mem_has_down
+    {T : Nat}
+    {S tops : List Erdos536.GridPoint}
+    (hOrd : OrderedSelectedDoubleTops T S tops)
+    {p : Erdos536.GridPoint}
+    (hp : p ∈ tops) :
+    ∃ down, IsSelectedAnnulusDoubleColumn T S p down := by
+  induction tops with
+  | nil =>
+      simp at hp
+  | cons a tail ih =>
+      cases tail with
+      | nil =>
+          simp [OrderedSelectedDoubleTops] at hOrd
+          simpa using hOrd
+      | cons b xs =>
+          rcases hOrd.1 with ⟨aDown, bDown, hA, hB, hab⟩
+          rcases List.mem_cons.mp hp with rfl | hpTail
+          · exact ⟨aDown, hA⟩
+          · exact ih hOrd.2 hpTail
+
+/--
+The top 3-exponent of every selected double column is positive.
+-/
+theorem selectedAnnulusDoubleColumn_top_j_pos
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    {top down : Erdos536.GridPoint}
+    (hDouble : IsSelectedAnnulusDoubleColumn T S top down) :
+    1 ≤ top.j := by
+  rcases hDouble with
+    ⟨_hTopS, _hDownS, _hTopAnn, _hDownAnn, _hSameI, hConsec⟩
+  omega
+
+/--
+For an ordered list of selected double-column tops, the corresponding list
+of top 3-exponents is two-separated descending.
+-/
+theorem orderedSelectedDoubleTops_map_j_twoSeparatedDescending
+    {T : Nat}
+    {S tops : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hOrd : OrderedSelectedDoubleTops T S tops) :
+    TwoSeparatedDescending (tops.map (fun p => p.j)) := by
+  induction tops with
+  | nil =>
+      simp [TwoSeparatedDescending]
+  | cons a tail ih =>
+      cases tail with
+      | nil =>
+          simp [TwoSeparatedDescending]
+      | cons b xs =>
+          rcases hOrd.1 with ⟨aDown, bDown, hA, hB, hab⟩
+          have hDrop : b.j + 2 ≤ a.j :=
+            selectedAnnulusDoubleColumns_top_j_drop_at_least_two
+              hGamma hA hB hab
+          simp only [List.map_cons, TwoSeparatedDescending]
+          constructor
+          · exact hDrop
+          · exact ih hOrd.2
+
+/--
+An ordered list of selected double columns whose top 3-exponents are all at
+most `J` has length at most `ceil(J/2) = (J+1)/2`.
+-/
+theorem orderedSelectedDoubleTops_length_le_ceiling_half
+    {T J : Nat}
+    {S tops : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hOrd : OrderedSelectedDoubleTops T S tops)
+    (hBound : ∀ p ∈ tops, p.j ≤ J) :
+    tops.length ≤ (J + 1) / 2 := by
+  cases tops with
+  | nil =>
+      simp
+  | cons a xs =>
+      have hSep :
+          TwoSeparatedDescending
+            ((a :: xs).map (fun p => p.j)) :=
+        orderedSelectedDoubleTops_map_j_twoSeparatedDescending
+          hGamma hOrd
+
+      have hPos :
+          ∀ x ∈ (a :: xs).map (fun p => p.j), 1 ≤ x := by
+        intro x hx
+        rcases List.mem_map.mp hx with ⟨p, hp, rfl⟩
+        rcases orderedSelectedDoubleTops_mem_has_down hOrd hp with
+          ⟨down, hDouble⟩
+        exact selectedAnnulusDoubleColumn_top_j_pos hDouble
+
+      have haJ : a.j ≤ J :=
+        hBound a (by simp)
+
+      have hCount :
+          ((a :: xs).map (fun p => p.j)).length ≤ (J + 1) / 2 := by
+        apply positive_twoSeparatedDescending_length_le_ceiling_half
+          (a := a.j)
+          (xs := xs.map (fun p => p.j))
+          (J := J)
+        · simpa using hSep
+        · simpa using hPos
+        · exact haJ
+
+      simpa using hCount
+
 end Erdos536813
