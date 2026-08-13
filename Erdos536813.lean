@@ -1307,8 +1307,10 @@ theorem orderedSelectedDoubleTops_mem_has_down
   | cons a tail ih =>
       cases tail with
       | nil =>
-          simp [OrderedSelectedDoubleTops] at hOrd
-          simpa using hOrd
+          have hpEq : p = a := by
+            simpa using hp
+          subst p
+          simpa [OrderedSelectedDoubleTops] using hOrd
       | cons b xs =>
           rcases hOrd.1 with ⟨aDown, bDown, hA, hB, hab⟩
           rcases List.mem_cons.mp hp with rfl | hpTail
