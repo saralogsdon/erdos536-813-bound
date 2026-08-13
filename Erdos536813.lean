@@ -861,4 +861,70 @@ theorem factor_five_window_forbids_sixfold
     False := by
   omega
 
+
+/--
+If two grid points have the same 2-exponent and their 3-exponents differ
+by at least two, then the larger value is at least nine times the smaller.
+-/
+theorem nine_mul_fiberValue_le_of_same_i_gap_two
+    {p q : Erdos536.GridPoint}
+    (hi : p.i = q.i)
+    (hGap : p.j + 2 ≤ q.j) :
+    9 * Erdos536.fiberValue 1 p ≤ Erdos536.fiberValue 1 q := by
+  have hPow : 3 ^ (p.j + 2) ≤ 3 ^ q.j :=
+    Nat.pow_le_pow_right (by decide : 0 < (3 : Nat)) hGap
+  calc
+    9 * Erdos536.fiberValue 1 p
+        = (2 ^ p.i) * 3 ^ (p.j + 2) := by
+            simp only [Erdos536.fiberValue, one_mul, pow_add]
+            norm_num
+            ring
+    _ ≤ (2 ^ p.i) * 3 ^ q.j :=
+      Nat.mul_le_mul_left (2 ^ p.i) hPow
+    _ = Erdos536.fiberValue 1 q := by
+      simp [Erdos536.fiberValue, hi]
+
+/--
+Two points in the factor-5 annulus with the same 2-exponent cannot have
+3-exponents separated by two or more.
+
+This is the formal version of the elementary observation
+
+    3^2 = 9 > 5,
+
+so a multiplicative interval of width 5 contains at most two consecutive
+powers of 3 once the power of 2 is fixed.
+-/
+theorem fiveAnnulus_same_i_forbids_j_gap_two
+    {T : Nat}
+    {p q : Erdos536.GridPoint}
+    (hp : InFiveAnnulus T p)
+    (hq : InFiveAnnulus T q)
+    (hi : p.i = q.i) :
+    ¬ p.j + 2 ≤ q.j := by
+  intro hGap
+  have hNine :
+      9 * Erdos536.fiberValue 1 p ≤ Erdos536.fiberValue 1 q :=
+    nine_mul_fiberValue_le_of_same_i_gap_two hi hGap
+  have hSix :
+      6 * Erdos536.fiberValue 1 p ≤ Erdos536.fiberValue 1 q := by
+    exact Nat.le_trans (by omega) hNine
+  exact factor_five_window_forbids_sixfold hp.2 hq.1 hSix
+
+/--
+Ordered form of the preceding spacing statement: with the same 2-exponent,
+two annulus points have 3-exponents differing by at most one.
+-/
+theorem fiveAnnulus_same_i_j_le_add_one
+    {T : Nat}
+    {p q : Erdos536.GridPoint}
+    (hp : InFiveAnnulus T p)
+    (hq : InFiveAnnulus T q)
+    (hi : p.i = q.i)
+    (hjq : p.j ≤ q.j) :
+    q.j ≤ p.j + 1 := by
+  have hNoGap :=
+    fiveAnnulus_same_i_forbids_j_gap_two hp hq hi
+  omega
+
 end Erdos536813
