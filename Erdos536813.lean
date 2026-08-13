@@ -1694,4 +1694,125 @@ theorem gammaFree_annulus_length_le_coordinate_bound
   have hSplit := base_extra_length_eq S
   omega
 
+
+/-!
+## Specializing the annulus count to logarithmic coordinate bounds
+
+For a point `p = (i,j)` with `2^i 3^j ≤ T`, we have
+
+    i ≤ log_2 T,    j ≤ log_3 T.
+
+Substituting these natural logarithmic bounds into the preceding coordinate
+count gives the hand-proof estimate
+
+    |S| ≤ log_2 T + 1 + ceil(log_3 T / 2).
+
+When `T ≥ 729 = 3^6`, the second logarithm is at least six, so this is at
+least three below the ordinary Gamma-free axis bound
+`log_2 T + log_3 T + 1`.
+-/
+
+/-- The ordinary one-slice Gamma-free benchmark in logarithmic form. -/
+def L23 (T : Nat) : Nat :=
+  Nat.log 2 T + Nat.log 3 T + 1
+
+/-- An annulus point has 2-exponent at most `floor(log_2 T)`. -/
+theorem fiveAnnulus_i_le_log_two
+    {T : Nat}
+    {p : Erdos536.GridPoint}
+    (hp : InFiveAnnulus T p) :
+    p.i ≤ Nat.log 2 T := by
+  have h3pos : 0 < 3 ^ p.j :=
+    Nat.pow_pos (by decide : 0 < (3 : Nat))
+  have hPowToValue :
+      2 ^ p.i ≤ Erdos536.fiberValue 1 p := by
+    have h :=
+      Nat.le_mul_of_pos_right (2 ^ p.i) h3pos
+    simpa [Erdos536.fiberValue] using h
+  have hPowT : 2 ^ p.i ≤ T :=
+    Nat.le_trans hPowToValue hp.1
+  exact Nat.le_log_of_pow_le (by decide : 1 < (2 : Nat)) hPowT
+
+/-- An annulus point has 3-exponent at most `floor(log_3 T)`. -/
+theorem fiveAnnulus_j_le_log_three
+    {T : Nat}
+    {p : Erdos536.GridPoint}
+    (hp : InFiveAnnulus T p) :
+    p.j ≤ Nat.log 3 T := by
+  have h2pos : 0 < 2 ^ p.i :=
+    Nat.pow_pos (by decide : 0 < (2 : Nat))
+  have hPowToValue :
+      3 ^ p.j ≤ Erdos536.fiberValue 1 p := by
+    have h :=
+      Nat.le_mul_of_pos_left (3 ^ p.j) h2pos
+    simpa [Erdos536.fiberValue, Nat.mul_comm] using h
+  have hPowT : 3 ^ p.j ≤ T :=
+    Nat.le_trans hPowToValue hp.1
+  exact Nat.le_log_of_pow_le (by decide : 1 < (3 : Nat)) hPowT
+
+/--
+Logarithmic form of the large-scale annulus counting inequality.
+-/
+theorem gammaFree_annulus_length_le_logs
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSAnn : ∀ p ∈ S, InFiveAnnulus T p) :
+    S.length ≤
+      (Nat.log 2 T + 1) + (Nat.log 3 T + 1) / 2 := by
+  exact gammaFree_annulus_length_le_coordinate_bound
+    hGamma
+    hSAnn
+    (fun p hp => fiveAnnulus_i_le_log_two (hSAnn p hp))
+    (fun p hp => fiveAnnulus_j_le_log_three (hSAnn p hp))
+
+/-- `T ≥ 729 = 3^6` forces `floor(log_3 T) ≥ 6`. -/
+theorem six_le_log_three_of_729_le
+    {T : Nat}
+    (hT : 729 ≤ T) :
+    6 ≤ Nat.log 3 T := by
+  have hPow : 3 ^ 6 ≤ T := by
+    norm_num
+    exact hT
+  exact Nat.le_log_of_pow_le (by decide : 1 < (3 : Nat)) hPow
+
+/--
+For `T ≥ 729`, every Gamma-free annulus family has deficit at least three
+relative to the ordinary one-slice Gamma-free benchmark `L23 T`.
+
+Writing the conclusion additively avoids truncated subtraction:
+
+    |S| + 3 ≤ log_2 T + log_3 T + 1.
+-/
+theorem gammaFree_annulus_large_deficit_three
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    (hT : 729 ≤ T)
+    (hGamma : Erdos536.GammaFree S)
+    (hSAnn : ∀ p ∈ S, InFiveAnnulus T p) :
+    S.length + 3 ≤ L23 T := by
+  have hCount :=
+    gammaFree_annulus_length_le_logs hGamma hSAnn
+  have hJ : 6 ≤ Nat.log 3 T :=
+    six_le_log_three_of_729_le hT
+  unfold L23
+  omega
+
+/--
+Concrete subset form of the large-scale annulus lemma.
+
+If `S` is any Gamma-free subfamily of the exact finite annulus list, then
+for `T ≥ 729` it has deficit at least three.
+-/
+theorem gammaFree_subset_fiveAnnulus_large_deficit_three
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    (hT : 729 ≤ T)
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (FiveAnnulusList T)) :
+    S.length + 3 ≤ L23 T := by
+  apply gammaFree_annulus_large_deficit_three hT hGamma
+  intro p hp
+  exact (mem_fiveAnnulusList).1 (hSub hp)
+
 end Erdos536813
