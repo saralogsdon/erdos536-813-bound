@@ -1,11 +1,11 @@
-name: Verify zero-upper deficit bridge
+name: Verify one-slice L23 bound
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  zero-upper-bridge:
+  axis-bound:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -24,5 +24,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build zero-upper deficit bridge
-        run: lake build Erdos536813.ZeroUpperBridge
+      - name: Build one-slice L23 bound
+        run: lake build Erdos536813.AxisBound
