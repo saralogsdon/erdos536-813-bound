@@ -3395,4 +3395,269 @@ theorem selected_twoLayer_45_deficit_two
   exact twoLayer_45_deficit_two
     hLowerGamma hLowerSub hUpperGamma hUpperSub hFree
 
+
+/-!
+### Next exact states: `T = 48, 54, 60, 64`
+
+For these states we reuse the general two-layer certificate.  The ordinary
+one-layer bounds are obtained structurally from Kenta Kitamura's axis-projection
+bound, with only the tiny axis counts evaluated by `native_decide`.
+-/
+
+/-- Structural one-layer Gamma-free bound for a concrete fiber region. -/
+theorem gammaFree_fiberRegion_length_le_axis
+    {T : Nat}
+    {S : List Erdos536.GridPoint}
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (Erdos536.FiberRegionList 1 T)) :
+    S.length ≤
+      ((Erdos536.FiberRegionList 1 T).filter
+        Erdos536.GridPoint.axisBool).length := by
+  have hComplete :
+      Erdos536.FiberRegionComplete
+        (Erdos536.FiberRegionList 1 T) 1 T :=
+    Erdos536.fiberRegionList_complete
+      (m := 1) (N := T) (by decide : 0 < (1 : Nat))
+  exact Erdos536.gammaFree_card_le_axis_card
+    hSub
+    (Erdos536.fiberRegionComplete_downClosed hComplete)
+    hGamma
+
+/-- Convenient specialization when the axis count has been certified. -/
+theorem gammaFree_fiberRegion_length_le_of_axis_count
+    {T B : Nat}
+    {S : List Erdos536.GridPoint}
+    (hAxis :
+      ((Erdos536.FiberRegionList 1 T).filter
+        Erdos536.GridPoint.axisBool).length = B)
+    (hGamma : Erdos536.GammaFree S)
+    (hSub : S.Subset (Erdos536.FiberRegionList 1 T)) :
+    S.length ≤ B := by
+  have h :=
+    gammaFree_fiberRegion_length_le_axis
+      (T := T) hGamma hSub
+  simpa [hAxis] using h
+
+/--
+Generic selected-fiber form of an exact two-layer certificate on two concrete
+fiber regions.
+-/
+theorem selected_twoLayer_deficit_two_of_certificate
+    {Tlow Tup Llow Lup q N : Nat}
+    {A : List Nat}
+    {Lower Upper : List Erdos536.GridPoint}
+    (hLlow : 1 ≤ Llow)
+    (hLup : 1 ≤ Lup)
+    (hq : 0 < q)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hCert :
+      TwoLayerDeficitTwoCertificate
+        (Erdos536.FiberRegionList 1 Tlow)
+        (Erdos536.FiberRegionList 1 Tup)
+        Llow Lup = true)
+    (hAxisLow :
+      ((Erdos536.FiberRegionList 1 Tlow).filter
+        Erdos536.GridPoint.axisBool).length = Llow)
+    (hAxisUp :
+      ((Erdos536.FiberRegionList 1 Tup).filter
+        Erdos536.GridPoint.axisBool).length = Lup)
+    (hLowerSelected :
+      Erdos536.FiberSelectedComplete Lower A q)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete Upper A (5 * q))
+    (hLowerSub :
+      Lower.Subset (Erdos536.FiberRegionList 1 Tlow))
+    (hUpperSub :
+      Upper.Subset (Erdos536.FiberRegionList 1 Tup)) :
+    Lower.length + Upper.length + 2 ≤ Llow + Lup := by
+  have hLowerGamma : Erdos536.GammaFree Lower :=
+    Erdos536.fiberSelected_gammaFree hq hA hLowerSelected
+  have h5q : 0 < 5 * q :=
+    Nat.mul_pos (by decide : 0 < (5 : Nat)) hq
+  have hUpperGamma : Erdos536.GammaFree Upper :=
+    Erdos536.fiberSelected_gammaFree h5q hA hUpperSelected
+  have hLowerBound : Lower.length ≤ Llow :=
+    gammaFree_fiberRegion_length_le_of_axis_count
+      hAxisLow hLowerGamma hLowerSub
+  have hUpperBound : Upper.length ≤ Lup :=
+    gammaFree_fiberRegion_length_le_of_axis_count
+      hAxisUp hUpperGamma hUpperSub
+  have hFree : TwoLayerTriangleFree Lower Upper :=
+    twoLayerTriangleFree_of_selected
+      hq hA hLowerSelected hUpperSelected
+  exact twoLayer_deficit_two_of_certificate
+    hLlow hLup hCert
+    hLowerGamma hLowerSub hLowerBound
+    hUpperGamma hUpperSub hUpperBound
+    hFree
+
+/- Small axis-count certificates used below. -/
+
+theorem fiberRegion_48_axis_count :
+    ((Erdos536.FiberRegionList 1 48).filter
+      Erdos536.GridPoint.axisBool).length = 9 := by
+  native_decide
+
+theorem fiberRegion_54_axis_count :
+    ((Erdos536.FiberRegionList 1 54).filter
+      Erdos536.GridPoint.axisBool).length = 9 := by
+  native_decide
+
+theorem fiberRegion_60_axis_count :
+    ((Erdos536.FiberRegionList 1 60).filter
+      Erdos536.GridPoint.axisBool).length = 9 := by
+  native_decide
+
+theorem fiberRegion_64_axis_count :
+    ((Erdos536.FiberRegionList 1 64).filter
+      Erdos536.GridPoint.axisBool).length = 10 := by
+  native_decide
+
+theorem fiberRegion_9_axis_count :
+    ((Erdos536.FiberRegionList 1 9).filter
+      Erdos536.GridPoint.axisBool).length = 6 := by
+  native_decide
+
+theorem fiberRegion_10_axis_count :
+    ((Erdos536.FiberRegionList 1 10).filter
+      Erdos536.GridPoint.axisBool).length = 6 := by
+  native_decide
+
+theorem fiberRegion_12_axis_count :
+    ((Erdos536.FiberRegionList 1 12).filter
+      Erdos536.GridPoint.axisBool).length = 6 := by
+  native_decide
+
+/- Exact two-layer Boolean certificates. -/
+
+theorem twoLayer_48_deficit_two_bool :
+    TwoLayerDeficitTwoCertificate
+      (Erdos536.FiberRegionList 1 48)
+      (Erdos536.FiberRegionList 1 9)
+      9 6 = true := by
+  native_decide
+
+theorem twoLayer_54_deficit_two_bool :
+    TwoLayerDeficitTwoCertificate
+      (Erdos536.FiberRegionList 1 54)
+      (Erdos536.FiberRegionList 1 10)
+      9 6 = true := by
+  native_decide
+
+theorem twoLayer_60_deficit_two_bool :
+    TwoLayerDeficitTwoCertificate
+      (Erdos536.FiberRegionList 1 60)
+      (Erdos536.FiberRegionList 1 12)
+      9 6 = true := by
+  native_decide
+
+theorem twoLayer_64_deficit_two_bool :
+    TwoLayerDeficitTwoCertificate
+      (Erdos536.FiberRegionList 1 64)
+      (Erdos536.FiberRegionList 1 12)
+      10 6 = true := by
+  native_decide
+
+/- Selected-fiber mathematical consequences. -/
+
+theorem selected_twoLayer_48_deficit_two
+    {q N : Nat}
+    {A : List Nat}
+    {Lower Upper : List Erdos536.GridPoint}
+    (hq : 0 < q)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hLowerSelected :
+      Erdos536.FiberSelectedComplete Lower A q)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete Upper A (5 * q))
+    (hLowerSub :
+      Lower.Subset (Erdos536.FiberRegionList 1 48))
+    (hUpperSub :
+      Upper.Subset (Erdos536.FiberRegionList 1 9)) :
+    Lower.length + Upper.length + 2 ≤ 15 := by
+  exact selected_twoLayer_deficit_two_of_certificate
+    (by decide : 1 ≤ (9 : Nat))
+    (by decide : 1 ≤ (6 : Nat))
+    hq hA
+    twoLayer_48_deficit_two_bool
+    fiberRegion_48_axis_count
+    fiberRegion_9_axis_count
+    hLowerSelected hUpperSelected
+    hLowerSub hUpperSub
+
+theorem selected_twoLayer_54_deficit_two
+    {q N : Nat}
+    {A : List Nat}
+    {Lower Upper : List Erdos536.GridPoint}
+    (hq : 0 < q)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hLowerSelected :
+      Erdos536.FiberSelectedComplete Lower A q)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete Upper A (5 * q))
+    (hLowerSub :
+      Lower.Subset (Erdos536.FiberRegionList 1 54))
+    (hUpperSub :
+      Upper.Subset (Erdos536.FiberRegionList 1 10)) :
+    Lower.length + Upper.length + 2 ≤ 15 := by
+  exact selected_twoLayer_deficit_two_of_certificate
+    (by decide : 1 ≤ (9 : Nat))
+    (by decide : 1 ≤ (6 : Nat))
+    hq hA
+    twoLayer_54_deficit_two_bool
+    fiberRegion_54_axis_count
+    fiberRegion_10_axis_count
+    hLowerSelected hUpperSelected
+    hLowerSub hUpperSub
+
+theorem selected_twoLayer_60_deficit_two
+    {q N : Nat}
+    {A : List Nat}
+    {Lower Upper : List Erdos536.GridPoint}
+    (hq : 0 < q)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hLowerSelected :
+      Erdos536.FiberSelectedComplete Lower A q)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete Upper A (5 * q))
+    (hLowerSub :
+      Lower.Subset (Erdos536.FiberRegionList 1 60))
+    (hUpperSub :
+      Upper.Subset (Erdos536.FiberRegionList 1 12)) :
+    Lower.length + Upper.length + 2 ≤ 15 := by
+  exact selected_twoLayer_deficit_two_of_certificate
+    (by decide : 1 ≤ (9 : Nat))
+    (by decide : 1 ≤ (6 : Nat))
+    hq hA
+    twoLayer_60_deficit_two_bool
+    fiberRegion_60_axis_count
+    fiberRegion_12_axis_count
+    hLowerSelected hUpperSelected
+    hLowerSub hUpperSub
+
+theorem selected_twoLayer_64_deficit_two
+    {q N : Nat}
+    {A : List Nat}
+    {Lower Upper : List Erdos536.GridPoint}
+    (hq : 0 < q)
+    (hA : Erdos536.LcmTriangleFreeUpTo N A)
+    (hLowerSelected :
+      Erdos536.FiberSelectedComplete Lower A q)
+    (hUpperSelected :
+      Erdos536.FiberSelectedComplete Upper A (5 * q))
+    (hLowerSub :
+      Lower.Subset (Erdos536.FiberRegionList 1 64))
+    (hUpperSub :
+      Upper.Subset (Erdos536.FiberRegionList 1 12)) :
+    Lower.length + Upper.length + 2 ≤ 16 := by
+  exact selected_twoLayer_deficit_two_of_certificate
+    (by decide : 1 ≤ (10 : Nat))
+    (by decide : 1 ≤ (6 : Nat))
+    hq hA
+    twoLayer_64_deficit_two_bool
+    fiberRegion_64_axis_count
+    fiberRegion_12_axis_count
+    hLowerSelected hUpperSelected
+    hLowerSub hUpperSub
+
 end Erdos536813
