@@ -1,13 +1,13 @@
-name: Verify deficit chain
+name: Verify slice deficit bridge
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  deficit-chain:
+  slice-deficit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -24,5 +24,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build deficit-chain bookkeeping
-        run: lake build Erdos536813.DeficitChain
+      - name: Build slice-deficit bridge
+        run: lake build Erdos536813.SliceDeficit
