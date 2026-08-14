@@ -1,4 +1,4 @@
-name: Verify candidate bound
+name: Verify interval core
 
 on:
   push:
@@ -18,74 +18,18 @@ jobs:
       - name: Independent hypergraph verifier
         run: python verify_two_layer_independent.py
 
-  lean-90:
+  lean-interval-core:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Install elan
-        run: |
-          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
-            | sh -s -- -y
-          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Restore compiled project modules
-        uses: actions/cache/restore@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}
-          restore-keys: |
-            project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
-      - name: Generate/update Lake manifest
-        run: lake update
-      - name: Get Mathlib cache
-        run: lake exe cache get
-      - name: Build T=90 cardinality-restricted certificate
-        run: lake build Erdos536813.TwoLayer90
-      - name: Save T=90 checkpoint
-        uses: actions/cache/save@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-90-cardinality
 
-  lean-96:
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v4
       - name: Install elan
         run: |
           curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Restore compiled project modules
-        uses: actions/cache/restore@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}
-          restore-keys: |
-            project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
-      - name: Generate/update Lake manifest
-        run: lake update
-      - name: Get Mathlib cache
-        run: lake exe cache get
-      - name: Build T=96 cardinality-restricted certificate
-        run: lake build Erdos536813.TwoLayer96
-      - name: Save T=96 checkpoint
-        uses: actions/cache/save@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-96-cardinality
 
-  lean-108:
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install elan
-        run: |
-          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
-            | sh -s -- -y
-          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Restore compiled project modules
         uses: actions/cache/restore@v5
         with:
@@ -93,14 +37,12 @@ jobs:
           key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}
           restore-keys: |
             project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
+
       - name: Generate/update Lake manifest
         run: lake update
+
       - name: Get Mathlib cache
         run: lake exe cache get
-      - name: Build T=108 cardinality-restricted certificate
-        run: lake build Erdos536813.TwoLayer108
-      - name: Save T=108 checkpoint
-        uses: actions/cache/save@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-108-cardinality
+
+      - name: Build finite interval interpolation core
+        run: lake build Erdos536813.TwoLayerIntervalsCore
