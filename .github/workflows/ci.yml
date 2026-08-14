@@ -18,9 +18,9 @@ jobs:
       - name: Independent hypergraph verifier
         run: python verify_two_layer_independent.py
 
-  lean-81:
+  lean-90:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 
@@ -44,11 +44,81 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build T=81 certificate only
-        run: lake build Erdos536813.TwoLayer81
+      - name: Build T=90 certificate only
+        run: lake build Erdos536813.TwoLayer90
 
-      - name: Save T=81 checkpoint
+      - name: Save T=90 checkpoint
         uses: actions/cache/save@v5
         with:
           path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-81
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-90
+
+  lean-96:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Restore compiled project modules
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}
+          restore-keys: |
+            project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
+
+      - name: Generate/update Lake manifest
+        run: lake update
+
+      - name: Get Mathlib cache
+        run: lake exe cache get
+
+      - name: Build T=96 certificate only
+        run: lake build Erdos536813.TwoLayer96
+
+      - name: Save T=96 checkpoint
+        uses: actions/cache/save@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-96
+
+  lean-108:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Restore compiled project modules
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}
+          restore-keys: |
+            project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
+
+      - name: Generate/update Lake manifest
+        run: lake update
+
+      - name: Get Mathlib cache
+        run: lake exe cache get
+
+      - name: Build T=108 certificate only
+        run: lake build Erdos536813.TwoLayer108
+
+      - name: Save T=108 checkpoint
+        uses: actions/cache/save@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-108
