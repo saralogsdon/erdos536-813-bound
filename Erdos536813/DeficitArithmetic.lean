@@ -1,7 +1,5 @@
 import Mathlib
 
-open scoped BigOperators
-
 namespace Erdos536813
 
 /-!
@@ -46,7 +44,7 @@ def finiteWeightedDeficit (t : Nat) : ℚ :=
 
 /-- Exact weighted contribution of all finite scales `t < 120`. -/
 theorem finite_weighted_deficit_sum :
-    (∑ t in Finset.range 120, finiteWeightedDeficit t) = (1 / 16 : ℚ) := by
+    Finset.sum (Finset.range 120) finiteWeightedDeficit = (1 / 16 : ℚ) := by
   native_decide
 
 /-- Basic telescoping weight in the `u` variable. -/
@@ -55,13 +53,13 @@ def uWeight (u : Nat) : ℚ :=
 
 /-- Base high-scale block weight. -/
 theorem base_u_weight_sum :
-    (∑ u in Finset.Icc 24 119, uWeight u) = (1 / 30 : ℚ) := by
+    Finset.sum (Finset.Icc 24 119) uWeight = (1 / 30 : ℚ) := by
   native_decide
 
 /-- Extra high-scale block weight. -/
 theorem extra_u_weight_sum :
-    (∑ u in Finset.Icc 45 71, uWeight u) +
-      (∑ u in Finset.Icc 75 119, uWeight u) =
+    Finset.sum (Finset.Icc 45 71) uWeight +
+      Finset.sum (Finset.Icc 75 119) uWeight =
         (1 / 75 : ℚ) := by
   native_decide
 
