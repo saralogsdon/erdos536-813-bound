@@ -20,7 +20,7 @@ jobs:
 
   lean:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -30,13 +30,13 @@ jobs:
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Restore Lake cache
-        uses: actions/cache@v5
+      - name: Restore compiled project modules
+        uses: actions/cache/restore@v5
         with:
-          path: .lake
-          key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}
           restore-keys: |
-            lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
+            project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
 
       - name: Generate/update Lake manifest
         run: lake update
@@ -44,5 +44,41 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build Lean project
+      - name: Build stable proof core
+        run: lake build Erdos536813.FastTwoLayerCore
+
+      - name: Save core checkpoint
+        uses: actions/cache/save@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-core
+
+      - name: Build finite states 45 through 64
+        run: |
+          lake build \
+            Erdos536813.TwoLayer45 \
+            Erdos536813.TwoLayer48 \
+            Erdos536813.TwoLayer54 \
+            Erdos536813.TwoLayer60 \
+            Erdos536813.TwoLayer64
+
+      - name: Save 45-64 checkpoint
+        uses: actions/cache/save@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-small
+
+      - name: Build finite states 80 and 81
+        run: |
+          lake build \
+            Erdos536813.TwoLayer80 \
+            Erdos536813.TwoLayer81
+
+      - name: Save 80-81 checkpoint
+        uses: actions/cache/save@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-large
+
+      - name: Build root theorem library
         run: lake build
