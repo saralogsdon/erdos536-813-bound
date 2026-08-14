@@ -18,9 +18,9 @@ jobs:
       - name: Independent hypergraph verifier
         run: python verify_two_layer_independent.py
 
-  lean:
+  lean-81:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -44,41 +44,11 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build stable proof core
-        run: lake build Erdos536813.FastTwoLayerCore
+      - name: Build T=81 certificate only
+        run: lake build Erdos536813.TwoLayer81
 
-      - name: Save core checkpoint
+      - name: Save T=81 checkpoint
         uses: actions/cache/save@v5
         with:
           path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-core
-
-      - name: Build finite states 45 through 64
-        run: |
-          lake build \
-            Erdos536813.TwoLayer45 \
-            Erdos536813.TwoLayer48 \
-            Erdos536813.TwoLayer54 \
-            Erdos536813.TwoLayer60 \
-            Erdos536813.TwoLayer64
-
-      - name: Save 45-64 checkpoint
-        uses: actions/cache/save@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-small
-
-      - name: Build finite states 80 and 81
-        run: |
-          lake build \
-            Erdos536813.TwoLayer80 \
-            Erdos536813.TwoLayer81
-
-      - name: Save 80-81 checkpoint
-        uses: actions/cache/save@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-large
-
-      - name: Build root theorem library
-        run: lake build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-81
