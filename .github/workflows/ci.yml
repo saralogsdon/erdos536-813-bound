@@ -1,13 +1,14 @@
-name: Verify corrected finite interval
+name: Verify deficit arithmetic
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  lean-full-finite-interval:
+  deficit-arithmetic:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
+
     steps:
       - uses: actions/checkout@v4
 
@@ -17,50 +18,11 @@ jobs:
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Restore T=80 checkpoint
-        uses: actions/cache/restore@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-two-layer80-v1
-
-      - name: Restore T=81 checkpoint
-        uses: actions/cache/restore@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-d73d03ab8bf44eba4df1663b671c0cb429dc3c27-81
-
-      - name: Restore T=90 checkpoint
-        uses: actions/cache/restore@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-4229639df26dbe7c04b1546427040e06b48f27e7-90
-
-      - name: Restore T=96 checkpoint
-        uses: actions/cache/restore@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-4229639df26dbe7c04b1546427040e06b48f27e7-96
-
-      - name: Restore T=108 checkpoint
-        uses: actions/cache/restore@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-4229639df26dbe7c04b1546427040e06b48f27e7-108
-
       - name: Generate/update Lake manifest
         run: lake update
 
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build T=80 dependency
-        run: lake build Erdos536813.TwoLayer80
-
-      - name: Save T=80 checkpoint
-        uses: actions/cache/save@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-two-layer80-v1
-
-      - name: Build full finite interval theorem
-        run: lake build Erdos536813.TwoLayerIntervals
+      - name: Build exact deficit arithmetic
+        run: lake build Erdos536813.DeficitArithmetic
