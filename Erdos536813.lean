@@ -12,3 +12,6 @@ import Erdos536813.TwoLayer60
 import Erdos536813.TwoLayer64
 import Erdos536813.TwoLayer80
 import Erdos536813.TwoLayer81
+import Erdos536813.TwoLayer90
+import Erdos536813.TwoLayer96
+import Erdos536813.TwoLayer108
