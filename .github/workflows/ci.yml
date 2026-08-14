@@ -1,11 +1,11 @@
-name: Verify one-slice L23 bound
+name: Verify actual 5-adic deficit chain
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  axis-bound:
+  fiber-deficit-chain:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -24,5 +24,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build one-slice L23 bound
-        run: lake build Erdos536813.AxisBound
+      - name: Build actual 5-adic deficit chain
+        run: lake build Erdos536813.FiberDeficitChain
