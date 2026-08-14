@@ -1,4 +1,4 @@
-name: Verify full finite interval
+name: Verify corrected finite interval
 
 on:
   push:
@@ -18,9 +18,12 @@ jobs:
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      # These three caches were saved by successful Run #57 jobs.
-      # Each already contains the common small-state checkpoint; overlaying
-      # them avoids re-running the expensive T=90,96,108 native_decide proofs.
+      - name: Restore T=81 checkpoint
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-d73d03ab8bf44eba4df1663b671c0cb429dc3c27-81
+
       - name: Restore T=90 checkpoint
         uses: actions/cache/restore@v5
         with:
