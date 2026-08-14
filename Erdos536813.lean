@@ -3068,12 +3068,32 @@ def TwoLayerTriangleFreeBool
       V.all (fun c =>
         ! IsLcmTriangleBool a b c)))
 
+theorem isLcmTriangleBool_eq_false_iff
+    (a b c : Nat) :
+    IsLcmTriangleBool a b c = false ↔
+      ¬ Erdos536.IsLcmTriangle a b c := by
+  constructor
+  · intro hFalse hTri
+    have hTrue : IsLcmTriangleBool a b c = true :=
+      (isLcmTriangleBool_eq_true_iff a b c).2 hTri
+    have hContra : False := by
+      simpa [hTrue] using hFalse
+    exact hContra.elim
+  · intro hNot
+    cases hBool : IsLcmTriangleBool a b c with
+    | false =>
+        rfl
+    | true =>
+        exfalso
+        apply hNot
+        exact (isLcmTriangleBool_eq_true_iff a b c).1 hBool
+
 theorem twoLayerTriangleFreeBool_eq_true_iff
     (Lower Upper : List Erdos536.GridPoint) :
     TwoLayerTriangleFreeBool Lower Upper = true ↔
       TwoLayerTriangleFree Lower Upper := by
   simp [TwoLayerTriangleFreeBool, TwoLayerTriangleFree,
-    isLcmTriangleBool_eq_true_iff]
+    isLcmTriangleBool_eq_false_iff]
 
 /-- Triangle-freeness depends only on the underlying multisets of values. -/
 theorem triangleFreeValues_of_perm
