@@ -1,13 +1,14 @@
-name: Verify T=108 certificate
+name: Verify full finite interval
 
 on:
   push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  lean-108:
+  lean-full-finite-interval:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -17,13 +18,26 @@ jobs:
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Restore compiled project modules
+      # These three caches were saved by successful Run #57 jobs.
+      # Each already contains the common small-state checkpoint; overlaying
+      # them avoids re-running the expensive T=90,96,108 native_decide proofs.
+      - name: Restore T=90 checkpoint
         uses: actions/cache/restore@v5
         with:
           path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-108-long
-          restore-keys: |
-            project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-4229639df26dbe7c04b1546427040e06b48f27e7-90
+
+      - name: Restore T=96 checkpoint
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-4229639df26dbe7c04b1546427040e06b48f27e7-96
+
+      - name: Restore T=108 checkpoint
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-4229639df26dbe7c04b1546427040e06b48f27e7-108
 
       - name: Generate/update Lake manifest
         run: lake update
@@ -31,12 +45,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build T=108 cardinality-restricted certificate
-        run: lake build Erdos536813.TwoLayer108
-
-      - name: Save T=108 checkpoint
-        if: success()
-        uses: actions/cache/save@v5
-        with:
-          path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-108-long
+      - name: Build full finite interval theorem
+        run: lake build Erdos536813.TwoLayerIntervals
