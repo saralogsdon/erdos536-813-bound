@@ -139,7 +139,7 @@ theorem fiberRegion_axis_card_le_L23
       exact List.toFinset_card_of_nodup hAxisNodup
     _ ≤ (AxisBenchmarkList T).toFinset.card := hCard
     _ ≤ (AxisBenchmarkList T).length :=
-      List.toFinset_card_le
+      List.toFinset_card_le (AxisBenchmarkList T)
     _ = L23 T := axisBenchmarkList_length T
 
 /--
