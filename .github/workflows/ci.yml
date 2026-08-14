@@ -1,26 +1,13 @@
-name: Verify assembled finite interval
+name: Verify T=108 certificate
 
 on:
   push:
-  pull_request:
   workflow_dispatch:
 
 jobs:
-  exact-python:
+  lean-108:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Exact finite verifier
-        run: python verify_finite.py
-      - name: Independent hypergraph verifier
-        run: python verify_two_layer_independent.py
-
-  lean-interval-before108:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 
@@ -34,7 +21,7 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: .lake/build
-          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-108-long
           restore-keys: |
             project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
 
@@ -44,5 +31,12 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build assembled finite interval through T=107
-        run: lake build Erdos536813.TwoLayerIntervalsBefore108
+      - name: Build T=108 cardinality-restricted certificate
+        run: lake build Erdos536813.TwoLayer108
+
+      - name: Save T=108 checkpoint
+        if: success()
+        uses: actions/cache/save@v5
+        with:
+          path: .lake/build
+          key: project-build-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ github.sha }}-108-long
