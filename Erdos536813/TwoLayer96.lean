@@ -1,4 +1,4 @@
-import Erdos536813.FastTwoLayerCore
+import Erdos536813.CardinalityFastTwoLayerCore
 
 namespace Erdos536813
 
@@ -12,8 +12,8 @@ theorem fiberRegion_19_axis_count_for_96 :
       Erdos536.GridPoint.axisBool).length = 7 := by
   native_decide
 
-theorem fast_twoLayer_96_deficit_two_bool :
-    FastTwoLayerDeficitTwoCertificate
+theorem cardinality_fast_twoLayer_96_deficit_two_bool :
+    CardinalityFastTwoLayerDeficitTwoCertificate
       (Erdos536.FiberRegionList 1 96)
       (Erdos536.FiberRegionList 1 19)
       11 7 = true := by
@@ -34,11 +34,11 @@ theorem selected_twoLayer_96_deficit_two
     (hUpperSub :
       Upper.Subset (Erdos536.FiberRegionList 1 19)) :
     Lower.length + Upper.length + 2 ≤ 18 := by
-  exact selected_twoLayer_deficit_two_of_fast_certificate
+  exact selected_twoLayer_deficit_two_of_cardinality_fast_certificate
     (by decide : 1 ≤ (11 : Nat))
     (by decide : 1 ≤ (7 : Nat))
     hq hA
-    fast_twoLayer_96_deficit_two_bool
+    cardinality_fast_twoLayer_96_deficit_two_bool
     fiberRegion_96_axis_count
     fiberRegion_19_axis_count_for_96
     hLowerSelected hUpperSelected
