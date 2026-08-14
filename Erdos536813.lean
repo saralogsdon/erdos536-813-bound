@@ -5,6 +5,7 @@ import Erdos536813.AnnulusFinite
 import Erdos536813.AdjacentLayer
 import Erdos536813.TwoLayerCore
 import Erdos536813.FastTwoLayerCore
+import Erdos536813.CardinalityFastTwoLayerCore
 import Erdos536813.TwoLayer45
 import Erdos536813.TwoLayer48
 import Erdos536813.TwoLayer54
