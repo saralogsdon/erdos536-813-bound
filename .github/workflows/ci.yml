@@ -1,11 +1,11 @@
-name: Verify deficit arithmetic
+name: Verify deficit chain
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  deficit-arithmetic:
+  deficit-chain:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -24,5 +24,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build exact deficit arithmetic
-        run: lake build Erdos536813.DeficitArithmetic
+      - name: Build deficit-chain bookkeeping
+        run: lake build Erdos536813.DeficitChain
