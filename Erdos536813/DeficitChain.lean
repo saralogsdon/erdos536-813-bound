@@ -7,13 +7,13 @@ namespace Erdos536813
 
 This file isolates the induction used in the global 5-adic argument.
 
-Think of `d k` as the deficit of the `k`th 5-adic slice.  At every high
+Think of `d k` as the deficit of the `k`th 5-adic slice. At every high
 scale, the adjacent-layer theorem gives the implication
 
     d (k + 1) = 0  ->  2 ≤ d k.
 
 Thus if the upper slice contributes no deficit, the lower slice contributes
-at least two.  Otherwise the upper slice itself contributes at least one.
+at least two. Otherwise the upper slice itself contributes at least one.
 The theorem below packages the resulting one-unit-per-high-scale saving.
 -/
 
@@ -29,6 +29,12 @@ theorem prefixDeficit_succ
       PrefixDeficit d n + d (n + 1) := by
   simpa [PrefixDeficit, Nat.add_assoc] using
     (Finset.sum_range_succ d (n + 1))
+
+/-- The zero-length prefix is just its single slice `d 0`. -/
+theorem prefixDeficit_zero
+    (d : Nat → Nat) :
+    PrefixDeficit d 0 = d 0 := by
+  simp [PrefixDeficit]
 
 /--
 If, for every adjacent pair among the first `n` high-scale transitions,
@@ -56,7 +62,8 @@ theorem highScaleChain_deficit
                   · omega
                   · simpa using hlast
                 rw [prefixDeficit_succ d 0]
-                simp [hlast]
+                rw [prefixDeficit_zero d]
+                rw [hlast]
                 omega
             | succ m =>
                 have hprefix : m ≤ PrefixDeficit d m := by
