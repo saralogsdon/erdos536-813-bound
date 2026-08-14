@@ -1,11 +1,11 @@
-name: Verify inner board identity
+name: Verify zero-upper deficit bridge
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  inner-board:
+  zero-upper-bridge:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -24,5 +24,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build inner-board identity
-        run: lake build Erdos536813.InnerBoard
+      - name: Build zero-upper deficit bridge
+        run: lake build Erdos536813.ZeroUpperBridge
