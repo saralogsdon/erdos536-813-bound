@@ -4,7 +4,11 @@ import Erdos536813.FiniteGamma
 import Erdos536813.AnnulusFinite
 import Erdos536813.AdjacentLayer
 import Erdos536813.TwoLayerCore
-import Erdos536813.TwoLayer45
-import Erdos536813.TwoLayer48_64
 import Erdos536813.FastTwoLayerCore
-import Erdos536813.TwoLayer80_81
+import Erdos536813.TwoLayer45
+import Erdos536813.TwoLayer48
+import Erdos536813.TwoLayer54
+import Erdos536813.TwoLayer60
+import Erdos536813.TwoLayer64
+import Erdos536813.TwoLayer80
+import Erdos536813.TwoLayer81
