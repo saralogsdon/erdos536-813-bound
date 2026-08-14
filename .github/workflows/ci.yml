@@ -1,4 +1,4 @@
-name: Verify interval core
+name: Verify assembled finite interval
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       - name: Independent hypergraph verifier
         run: python verify_two_layer_independent.py
 
-  lean-interval-core:
+  lean-interval-before108:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -44,5 +44,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build finite interval interpolation core
-        run: lake build Erdos536813.TwoLayerIntervalsCore
+      - name: Build assembled finite interval through T=107
+        run: lake build Erdos536813.TwoLayerIntervalsBefore108
