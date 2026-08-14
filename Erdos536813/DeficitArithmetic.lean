@@ -1,5 +1,7 @@
 import Mathlib
 
+open scoped BigOperators
+
 namespace Erdos536813
 
 /-!
@@ -19,7 +21,7 @@ For `t < 120`, the target deficit table is
 The weighted finite contribution is exactly `1/16`.
 
 For the high-scale block decomposition, the base `u`-weight is `1/30` and the
-extra-block weight is `1/75`.  Together with the geometric-series factors used
+extra-block weight is `1/75`. Together with the geometric-series factors used
 later, this leads to the total target saving `61/800` and hence the coefficient
 `813/1000`.
 -/
