@@ -154,6 +154,17 @@ theorem positiveDepthContribution_hasSum :
     norm_num
 
   rw [hval] at h
-  simpa [positiveDepthContribution] using h
+
+  change
+    HasSum
+      (fun n : Nat =>
+        (1 / 30 : ℝ) *
+            (((n + 1 : Nat) : ℝ) *
+              (1 / 5 : ℝ) ^ (n + 1)) +
+          (1 / 75 : ℝ) *
+            ((1 / 5 : ℝ) ^ (n + 1)))
+      (11 / 800 : ℝ)
+
+  exact h
 
 end Erdos536813
