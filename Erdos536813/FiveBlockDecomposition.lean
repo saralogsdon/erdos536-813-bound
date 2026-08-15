@@ -48,7 +48,7 @@ theorem exists_canonical_five_scale
   have hTerminal : FiveScale t n < 120 := by
     exact Nat.find_spec hexists
 
-  have hHigh :
+    have hHigh :
       ∀ k < n, 120 ≤ FiveScale t k := by
     intro k hk
     have hNot :
@@ -56,7 +56,7 @@ theorem exists_canonical_five_scale
       Nat.find_min hexists hk
     omega
 
-    have hnZero : n ≠ 0 := by
+  have hnZero : n ≠ 0 := by
     intro hn
     have hScaleZero : FiveScale t n = t := by
       simp [hn, FiveScale]
