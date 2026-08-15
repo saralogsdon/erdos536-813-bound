@@ -106,10 +106,14 @@ theorem actualFiveSlice_subset_normalized
       FiveBase m k * Erdos536.fiberValue 1 p ≤ N := by
     simpa [Erdos536.fiberValue, Nat.mul_assoc] using hpBound
 
+  have hmul' :
+      Erdos536.fiberValue 1 p * FiveBase m k ≤ N := by
+    simpa [Nat.mul_comm] using hmul
+
   have hnorm :
       Erdos536.fiberValue 1 p ≤
         N / FiveBase m k :=
-    (Nat.le_div_iff_mul_le hbase).mpr hmul
+    (Nat.le_div_iff_mul_le hbase).mpr hmul'
 
   have hscale :
       FiveScale (N / m) k =
