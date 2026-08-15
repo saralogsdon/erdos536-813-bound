@@ -1,11 +1,11 @@
-name: Verify canonical block uniqueness
+name: Verify fixed-depth high block sum
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  block-unique:
+  fixed-depth-block-sum:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build canonical block uniqueness
-        run: lake build Erdos536813.FiveBlockCanonical
+      - name: Build fixed-depth high block sum
+        run: lake build Erdos536813.HighScaleFixedDepthSum
