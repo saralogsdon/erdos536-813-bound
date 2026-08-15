@@ -1,11 +1,11 @@
-name: Verify actual 5-adic deficit chain
+name: Verify terminal deficit boosts
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  fiber-deficit-chain:
+  terminal-boost:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -24,5 +24,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build actual 5-adic deficit chain
-        run: lake build Erdos536813.FiberDeficitChain
+      - name: Build terminal deficit boosts
+        run: lake build Erdos536813.TerminalBoost
