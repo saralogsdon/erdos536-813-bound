@@ -16,16 +16,12 @@ resulting series has total sum
     1/96 + 1/300 = 11/800.
 -/
 
-def positiveDepthContribution (n : Nat) : ℝ :=
+noncomputable def positiveDepthContribution (n : Nat) : ℝ :=
   (1 / 30 : ℝ) *
       (((n + 1 : Nat) : ℝ) * (1 / 5 : ℝ) ^ (n + 1)) +
     (1 / 75 : ℝ) *
       ((1 / 5 : ℝ) ^ (n + 1))
 
-/--
-The shifted base-depth series still sums to `5/16`:
-`sum_{n≥0} (n+1)/5^(n+1) = 5/16`.
--/
 theorem shifted_base_depth_geometric_hasSum :
     HasSum
       (fun n : Nat =>
@@ -33,22 +29,36 @@ theorem shifted_base_depth_geometric_hasSum :
           (1 / 5 : ℝ) ^ (n + 1)))
       (5 / 16 : ℝ) := by
 
-  have h1 :=
+  have h1 :
+      HasSum
+        (fun n : Nat =>
+          (1 / 5 : ℝ) *
+            ((n : ℝ) * (1 / 5 : ℝ) ^ n))
+        ((1 / 5 : ℝ) * (5 / 16 : ℝ)) :=
     base_depth_geometric_hasSum.mul_left (1 / 5 : ℝ)
 
-  have h2 :=
+  have h2 :
+      HasSum
+        (fun n : Nat =>
+          (1 / 5 : ℝ) * (1 / 5 : ℝ) ^ n)
+        (1 / 4 : ℝ) :=
     extra_depth_geometric_hasSum
 
-  have h12 :
+  have h :
       HasSum
         (fun n : Nat =>
           (1 / 5 : ℝ) *
               ((n : ℝ) * (1 / 5 : ℝ) ^ n) +
             (1 / 5 : ℝ) *
               (1 / 5 : ℝ) ^ n)
-        (5 / 16 : ℝ) := by
-    have h := h1.add h2
-    convert h using 1 <;> norm_num
+        ((1 / 5 : ℝ) * (5 / 16 : ℝ) + 1 / 4) :=
+    h1.add h2
+
+  have hval :
+      (1 / 5 : ℝ) * (5 / 16 : ℝ) + 1 / 4 = 5 / 16 := by
+    norm_num
+
+  rw [hval] at h
 
   have hfun :
       (fun n : Nat =>
@@ -65,12 +75,8 @@ theorem shifted_base_depth_geometric_hasSum :
     ring
 
   rw [hfun]
-  exact h12
+  exact h
 
-/--
-After multiplying by the terminal base weight `1/30`, the shifted base
-contribution is exactly `1/96`.
--/
 theorem positive_depth_base_contribution_hasSum :
     HasSum
       (fun n : Nat =>
@@ -78,14 +84,23 @@ theorem positive_depth_base_contribution_hasSum :
           (((n + 1 : Nat) : ℝ) *
             (1 / 5 : ℝ) ^ (n + 1)))
       (1 / 96 : ℝ) := by
-  have h :=
+
+  have h :
+      HasSum
+        (fun n : Nat =>
+          (1 / 30 : ℝ) *
+            (((n + 1 : Nat) : ℝ) *
+              (1 / 5 : ℝ) ^ (n + 1)))
+        ((1 / 30 : ℝ) * (5 / 16 : ℝ)) :=
     shifted_base_depth_geometric_hasSum.mul_left (1 / 30 : ℝ)
-  norm_num at h
+
+  have hval :
+      (1 / 30 : ℝ) * (5 / 16 : ℝ) = 1 / 96 := by
+    norm_num
+
+  rw [hval] at h
   exact h
 
-/--
-The shifted terminal-extra contribution is exactly `1/300`.
--/
 theorem positive_depth_extra_contribution_hasSum :
     HasSum
       (fun n : Nat =>
@@ -93,7 +108,13 @@ theorem positive_depth_extra_contribution_hasSum :
           ((1 / 5 : ℝ) ^ (n + 1)))
       (1 / 300 : ℝ) := by
 
-  have h :=
+  have h :
+      HasSum
+        (fun n : Nat =>
+          (1 / 75 : ℝ) *
+            ((1 / 5 : ℝ) *
+              (1 / 5 : ℝ) ^ n))
+        (1 / 300 : ℝ) :=
     extra_high_scale_contribution_hasSum
 
   have hfun :
@@ -111,19 +132,28 @@ theorem positive_depth_extra_contribution_hasSum :
   rw [hfun]
   exact h
 
-/--
-The complete positive-depth high-scale contribution is `11/800`.
--/
 theorem positiveDepthContribution_hasSum :
     HasSum
       positiveDepthContribution
       (11 / 800 : ℝ) := by
 
-  have h :=
+  have h :
+      HasSum
+        (fun n : Nat =>
+          (1 / 30 : ℝ) *
+              (((n + 1 : Nat) : ℝ) *
+                (1 / 5 : ℝ) ^ (n + 1)) +
+            (1 / 75 : ℝ) *
+              ((1 / 5 : ℝ) ^ (n + 1)))
+        ((1 / 96 : ℝ) + 1 / 300) :=
     positive_depth_base_contribution_hasSum.add
       positive_depth_extra_contribution_hasSum
 
-  unfold positiveDepthContribution
-  convert h using 1 <;> norm_num
+  have hval :
+      (1 / 96 : ℝ) + 1 / 300 = 11 / 800 := by
+    norm_num
+
+  rw [hval] at h
+  simpa [positiveDepthContribution] using h
 
 end Erdos536813
