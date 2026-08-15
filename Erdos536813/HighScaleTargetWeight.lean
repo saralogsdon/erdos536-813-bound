@@ -67,7 +67,6 @@ theorem highTarget_u_weight_sum
   rw [← Finset.mul_sum]
   rw [base_u_weight_sum]
   rw [highExtra_indicator_u_weight_sum]
-  ring
 
 /--
 For one complete `(n,u)` block, multiplying its outer weight by the forced
