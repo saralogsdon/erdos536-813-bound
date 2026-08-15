@@ -1,11 +1,11 @@
-name: Verify weak finite ranges
+name: Verify consolidated fiber target
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  weak-finite-ranges:
+  fiber-target:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build weak finite ranges
-        run: lake build Erdos536813.WeakFiniteRanges
+      - name: Build consolidated fiber target
+        run: lake build Erdos536813.FiberTarget
