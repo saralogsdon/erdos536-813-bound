@@ -267,6 +267,8 @@ theorem highScaleChain_with_next_pair_one
     n + 1 ≤ PrefixDeficit d (n + 2) := by
   have hPrefix : n ≤ PrefixDeficit d n :=
     highScaleChain_deficit d n hforce
+  have hterm' : 1 ≤ d (n + 1) + d (n + 1 + 1) := by
+    simpa [Nat.add_assoc] using hterm
   rw [prefixDeficit_succ d (n + 1)]
   rw [prefixDeficit_succ d n]
   omega
@@ -375,7 +377,6 @@ theorem fiveAdic_terminal_75_79_boost
   have hScaleNextNext : FiveScale t (n + 2) = 3 := by
     rw [fiveScale_succ]
     rw [hScaleNext]
-    norm_num
 
   have hq : 0 < FiveBase m (n + 1) := by
     unfold FiveBase
