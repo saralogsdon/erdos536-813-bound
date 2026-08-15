@@ -1,11 +1,11 @@
-name: Verify actual five-adic fiber chain
+name: Verify actual fiber deficit benchmark
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  actual-five-fiber:
+  actual-fiber-benchmark:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build actual five-adic fiber chain
-        run: lake build Erdos536813.ActualFiveFiber
+      - name: Build actual fiber deficit benchmark
+        run: lake build Erdos536813.ActualFiberBenchmark
