@@ -1,11 +1,11 @@
-name: Verify high-scale geometric bookkeeping
+name: Verify factor-5 block weights
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  high-scale-geometric:
+  block-weight:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build high-scale geometric bookkeeping
-        run: lake build Erdos536813.HighScaleGeometric
+      - name: Build factor-5 block weights
+        run: lake build Erdos536813.HighScaleBlockWeight
