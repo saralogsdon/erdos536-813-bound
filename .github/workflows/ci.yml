@@ -7,7 +7,7 @@ on:
 jobs:
   terminal-boost:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +17,39 @@ jobs:
           curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      # Restore the already kernel-checked finite-certificate build products.
+      # These are the same checkpoints used by the successful Run #71.
+
+      - name: Restore T=80 checkpoint
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-Linux-X64-a0371b9093c4eae338edd7cc623d94d8bc4f303d05f0ac1deddb2eacbb3f1c0a-bc0cb0f681102c45dc5e1bde2f543f9ac652f24172d8bd0a7be59c676a127891-two-layer80-v1
+
+      - name: Restore T=81 checkpoint
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-Linux-X64-a0371b9093c4eae338edd7cc623d94d8bc4f303d05f0ac1deddb2eacbb3f1c0a-bc0cb0f681102c45dc5e1bde2f543f9ac652f24172d8bd0a7be59c676a127891-d73d03ab8bf44eba4df1663b671c0cb429dc3c27-81
+
+      - name: Restore T=90 checkpoint
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-Linux-X64-a0371b9093c4eae338edd7cc623d94d8bc4f303d05f0ac1deddb2eacbb3f1c0a-bc0cb0f681102c45dc5e1bde2f543f9ac652f24172d8bd0a7be59c676a127891-4229639df26dbe7c04b1546427040e06b48f27e7-90
+
+      - name: Restore T=96 checkpoint
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-Linux-X64-a0371b9093c4eae338edd7cc623d94d8bc4f303d05f0ac1deddb2eacbb3f1c0a-bc0cb0f681102c45dc5e1bde2f543f9ac652f24172d8bd0a7be59c676a127891-4229639df26dbe7c04b1546427040e06b48f27e7-96
+
+      - name: Restore T=108 checkpoint
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: project-build-Linux-X64-a0371b9093c4eae338edd7cc623d94d8bc4f303d05f0ac1deddb2eacbb3f1c0a-bc0cb0f681102c45dc5e1bde2f543f9ac652f24172d8bd0a7be59c676a127891-4229639df26dbe7c04b1546427040e06b48f27e7-108
 
       - name: Generate/update Lake manifest
         run: lake update
