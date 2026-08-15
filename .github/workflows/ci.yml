@@ -1,11 +1,11 @@
-name: Verify fixed-depth high block sum
+name: Verify positive-depth high-scale series
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  fixed-depth-block-sum:
+  depth-series:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build fixed-depth high block sum
-        run: lake build Erdos536813.HighScaleFixedDepthSum
+      - name: Build positive-depth high-scale series
+        run: lake build Erdos536813.HighScaleDepthSeries
