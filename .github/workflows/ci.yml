@@ -1,11 +1,11 @@
-name: Verify consolidated fiber target
+name: Verify canonical five-block decomposition
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  fiber-target:
+  five-block:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build consolidated fiber target
-        run: lake build Erdos536813.FiberTarget
+      - name: Build canonical five-block decomposition
+        run: lake build Erdos536813.FiveBlockDecomposition
