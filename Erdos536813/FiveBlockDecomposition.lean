@@ -56,26 +56,31 @@ theorem exists_canonical_five_scale
       Nat.find_min hexists hk
     omega
 
-  have hnZero : n ≠ 0 := by
+    have hnZero : n ≠ 0 := by
     intro hn
-    subst n
-    simp [FiveScale] at hTerminal
+    have hScaleZero : FiveScale t n = t := by
+      simp [hn, FiveScale]
+    rw [hScaleZero] at hTerminal
     omega
 
   have hnPos : 1 ≤ n :=
     Nat.one_le_iff_ne_zero.mpr hnZero
 
   have hLower : 24 ≤ FiveScale t n := by
-    cases n with
-    | zero =>
-        contradiction
-    | succ k =>
-        have hPrev :
-            120 ≤ FiveScale t k :=
-          hHigh k (Nat.lt_succ_self k)
-        rw [show Nat.succ k = k + 1 by omega]
-        rw [fiveScale_succ]
+    have hPrev :
+        120 ≤ FiveScale t (n - 1) := by
+      exact hHigh (n - 1) (by omega)
+
+    have hStep :
+        FiveScale t n =
+          FiveScale t (n - 1) / 5 := by
+      have hnDecomp : n = (n - 1) + 1 := by
         omega
+      rw [hnDecomp]
+      exact fiveScale_succ t (n - 1)
+
+    rw [hStep]
+    omega
 
   have hUpper : FiveScale t n ≤ 119 := by
     omega
