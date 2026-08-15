@@ -1,11 +1,11 @@
-name: Verify terminal deficit boosts
+name: Verify weak finite ranges
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  terminal-boost:
+  weak-finite-ranges:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -17,9 +17,6 @@ jobs:
           curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-
-      # Restore the already kernel-checked finite-certificate build products.
-      # These are the same checkpoints used by the successful Run #71.
 
       - name: Restore T=80 checkpoint
         uses: actions/cache/restore@v5
@@ -57,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build terminal deficit boosts
-        run: lake build Erdos536813.TerminalBoost
+      - name: Build weak finite ranges
+        run: lake build Erdos536813.WeakFiniteRanges
