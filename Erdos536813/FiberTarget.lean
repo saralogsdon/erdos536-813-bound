@@ -184,6 +184,9 @@ theorem highFiberTarget_le_fiberPrefix
 
   let d := FiberSliceDeficit t F
 
+  change highFiberTarget n (FiveScale t n) ≤
+    PrefixDeficit d (n + 2)
+
   by_cases hExtra : InHighExtraRange (FiveScale t n)
 
   · rw [highFiberTarget, if_pos hExtra]
