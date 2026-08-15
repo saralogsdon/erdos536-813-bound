@@ -1,11 +1,11 @@
-name: Verify canonical five-block decomposition
+name: Verify high-scale geometric bookkeeping
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  five-block:
+  high-scale-geometric:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build canonical five-block decomposition
-        run: lake build Erdos536813.FiveBlockDecomposition
+      - name: Build high-scale geometric bookkeeping
+        run: lake build Erdos536813.HighScaleGeometric
