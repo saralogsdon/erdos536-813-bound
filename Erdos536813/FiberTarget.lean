@@ -25,6 +25,11 @@ contribute one additional unit.
 def InHighExtraRange (u : Nat) : Prop :=
   (45 ≤ u ∧ u ≤ 71) ∨ (75 ≤ u ∧ u ≤ 119)
 
+instance instDecidableInHighExtraRange (u : Nat) :
+    Decidable (InHighExtraRange u) := by
+  unfold InHighExtraRange
+  infer_instance
+
 /-- Numerical high-scale target: one unit per high transition, plus the terminal bonus. -/
 def highFiberTarget (n u : Nat) : Nat :=
   n + if InHighExtraRange u then 1 else 0
