@@ -1,11 +1,11 @@
-name: Verify canonical factor-5 block partition
+name: Verify canonical block uniqueness
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  block-partition:
+  block-unique:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build canonical factor-5 block partition
-        run: lake build Erdos536813.FiveBlockPartition
+      - name: Build canonical block uniqueness
+        run: lake build Erdos536813.FiveBlockCanonical
