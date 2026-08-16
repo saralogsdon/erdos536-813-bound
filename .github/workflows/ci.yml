@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build whole-chain target saving
-        run: lake build Erdos536813.WholeChainTarget
+      - name: Build global core decomposition
+        run: lake build Erdos536813.GlobalCoreSum
