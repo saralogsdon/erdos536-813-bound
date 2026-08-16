@@ -1,11 +1,11 @@
-name: Verify complete finite five-adic chains
+name: Verify whole-chain target saving
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  complete-five-chains:
+  whole-chain-target:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build complete finite five-adic chains
-        run: lake build Erdos536813.CompleteFiveChain
+      - name: Build whole-chain target saving
+        run: lake build Erdos536813.WholeChainTarget
