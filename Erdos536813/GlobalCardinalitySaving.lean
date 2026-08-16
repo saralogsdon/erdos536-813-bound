@@ -48,7 +48,6 @@ theorem fiveCodeIntegerListSum_eq_globalFiveCodeFinsetIntegerSum
     FiveCodeIntegerWeight
 
   exact hSum.symm
-  simpa [FiveCodeIntegerWeight] using hSum.symm
 
 /--
 The original cardinality is bounded by the global integer-fiber sum
