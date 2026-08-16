@@ -44,7 +44,7 @@ theorem globalFiveCodeFinsetIntegerSum_eq_globalCoreIntegerSum
 
   rw [Finset.sum_image (by
     intro k₁ hk₁ k₂ hk₂ hEq
-    exact (Prod.mk.inj_iff.mp hEq).2)]
+    exact congrArg Prod.snd hEq
 
   simp [FiveCodeIntegerWeight]
 
