@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build canonical high depth
-        run: lake build Erdos536813.CanonicalHighDepth
+      - name: Build global combined target
+        run: lake build Erdos536813.GlobalCombinedTarget
