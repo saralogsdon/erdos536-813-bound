@@ -15,6 +15,7 @@ theorem depth_le_of_fiveBase_le
     (hm : GoodThirtyCore m)
     (hBase : FiveBase m k ≤ N) :
     k ≤ N := by
+  have hmPos : 0 < m := hm.1
   have hmOne : 1 ≤ m := by omega
   have hPowBase : 5 ^ k ≤ FiveBase m k := by
     unfold FiveBase
