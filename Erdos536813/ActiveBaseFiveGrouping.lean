@@ -23,13 +23,17 @@ This is the finite bookkeeping bridge needed before summing the verified
 -/
 
 /-- All good `2,3`-fiber bases up to `N`. -/
-noncomputable def GoodBaseUpToList (N : Nat) : List Nat :=
-  (List.range (N + 1)).filter
-    (fun q => decide (Erdos536.GoodFiberBase q))
+noncomputable def GoodBaseUpToList (N : Nat) : List Nat := by
+  classical
+  exact
+    (List.range (N + 1)).filter
+      (fun q => decide (Erdos536.GoodFiberBase q))
 
 theorem goodBaseUpToList_nodup
     (N : Nat) :
     (GoodBaseUpToList N).Nodup := by
+  classical
+  unfold GoodBaseUpToList
   exact List.nodup_range.filter
     (fun q => decide (Erdos536.GoodFiberBase q))
 
@@ -37,8 +41,17 @@ theorem mem_goodBaseUpToList
     {N q : Nat} :
     q ∈ GoodBaseUpToList N ↔
       q ≤ N ∧ Erdos536.GoodFiberBase q := by
-  simp [GoodBaseUpToList]
-  omega
+  classical
+  constructor
+  · intro hq
+    have hdata :
+        q < N + 1 ∧ Erdos536.GoodFiberBase q := by
+      simpa [GoodBaseUpToList] using hq
+    exact ⟨Nat.le_of_lt_succ hdata.1, hdata.2⟩
+  · intro hq
+    have hlt : q < N + 1 :=
+      Nat.lt_succ_of_le hq.1
+    simpa [GoodBaseUpToList, hlt, hq.2]
 
 /-- Every upstream active base is one of the good bases up to `N`. -/
 theorem fiberActiveBaseList_subset_goodBaseUpToList
@@ -83,7 +96,7 @@ theorem fiberInteger_sum_filter_base_eq_good
     ((L.filter
         (fun q => decide (Erdos536.GoodFiberBase q))).map
       (fun q => (Erdos536.FiberIntegerList A q).length)).sum := by
-
+  classical
   induction L with
   | nil =>
       simp
@@ -113,7 +126,7 @@ theorem fiberActiveIntegerSum_eq_goodBaseIntegerSum
     =
     ((GoodBaseUpToList N).map
       (fun q => (Erdos536.FiberIntegerList A q).length)).sum := by
-
+  classical
   simpa [Erdos536.FiberActiveBaseList, GoodBaseUpToList] using
     (fiberInteger_sum_filter_base_eq_good
       (A := A) (N := N) hA (List.range (N + 1)))
@@ -147,18 +160,19 @@ def FiveCode (q : Nat) : Nat × Nat :=
 theorem fiveCode_reconstruct
     (q : Nat) :
     FiveBase (FiveCode q).1 (FiveCode q).2 = q := by
-  simp [FiveCode, FiveBase, fiveCore_mul_pow_fiveExponent]
+  simpa [FiveCode, FiveBase] using
+    (fiveCore_mul_pow_fiveExponent q)
 
 /-- The factor-5 code is injective. -/
 theorem fiveCode_injective :
     Function.Injective FiveCode := by
   intro q r hCode
   have hCore :
-      FiveCore q = FiveCore r :=
-    congrArg Prod.fst hCode
+      FiveCore q = FiveCore r := by
+    simpa [FiveCode] using congrArg Prod.fst hCode
   have hExp :
-      FiveExponent q = FiveExponent r :=
-    congrArg Prod.snd hCode
+      FiveExponent q = FiveExponent r := by
+    simpa [FiveCode] using congrArg Prod.snd hCode
 
   calc
     q = FiveCore q * 5 ^ FiveExponent q :=
@@ -189,7 +203,7 @@ theorem mem_goodBaseFiveCodeList_data
     GoodThirtyCore m ∧
       FiveBase m k ≤ N ∧
       Erdos536.GoodFiberBase (FiveBase m k) := by
-
+  classical
   rw [GoodBaseFiveCodeList, List.mem_map] at h
   rcases h with ⟨q, hq, hCode⟩
 
@@ -199,15 +213,35 @@ theorem mem_goodBaseFiveCodeList_data
   have hCoreData :=
     fiveCore_goodThirty_of_goodFiberBase hqData.2
 
-  have hRec :=
-    fiveCode_reconstruct q
+  have hCore :
+      FiveCore q = m := by
+    simpa [FiveCode] using congrArg Prod.fst hCode
 
-  have hPair :
-      m = FiveCore q ∧ k = FiveExponent q := by
-    simpa [FiveCode] using Prod.mk.inj hCode.symm
+  have hExp :
+      FiveExponent q = k := by
+    simpa [FiveCode] using congrArg Prod.snd hCode
 
-  rcases hPair with ⟨rfl, rfl⟩
-  exact ⟨hCoreData, hRec ▸ hqData.1, hRec ▸ hqData.2⟩
+  have hRec :
+      FiveBase m k = q := by
+    unfold FiveBase
+    rw [← hCore, ← hExp]
+    exact fiveCore_mul_pow_fiveExponent q
+
+  have hmThirty :
+      GoodThirtyCore m := by
+    simpa [hCore] using hCoreData
+
+  have hBound :
+      FiveBase m k ≤ N := by
+    rw [hRec]
+    exact hqData.1
+
+  have hGood :
+      Erdos536.GoodFiberBase (FiveBase m k) := by
+    rw [hRec]
+    exact hqData.2
+
+  exact ⟨hmThirty, hBound, hGood⟩
 
 /--
 The sum over all good bases is exactly the same sum reindexed by their
