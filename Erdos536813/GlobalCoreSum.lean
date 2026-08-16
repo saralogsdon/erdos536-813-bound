@@ -2,8 +2,10 @@ import Erdos536813.CompleteFiveChain
 
 namespace Erdos536813
 
+open scoped Classical
+
 noncomputable def GoodCoreFinset (N : Nat) : Finset Nat :=
-  (Finset.range (N + 1)).filter (fun m => decide (GoodThirtyCore m))
+  (Finset.range (N + 1)).filter (fun m => GoodThirtyCore m)
 
 theorem mem_goodCoreFinset_iff
     {N m : Nat} :
@@ -12,11 +14,6 @@ theorem mem_goodCoreFinset_iff
   classical
   unfold GoodCoreFinset
   simp
-  constructor
-  · intro h
-    exact ⟨h.1, of_decide_eq_true h.2⟩
-  · rintro ⟨hmN, hm⟩
-    exact ⟨hmN, decide_eq_true_eq.mpr hm⟩
 
 theorem globalCode_mem_some_core
     {N m k : Nat}
