@@ -1,11 +1,11 @@
-name: Verify safe high-scale fiber prefix
+name: Verify exact five-code characterization
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  safe-high-fiber-prefix:
+  exact-five-code-characterization:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build safe high-scale fiber prefix
-        run: lake build Erdos536813.SafeHighFiberPrefix
+      - name: Build exact five-code characterization
+        run: lake build Erdos536813.FiveCodeCharacterization
