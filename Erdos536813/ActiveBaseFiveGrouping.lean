@@ -22,36 +22,52 @@ This is the finite bookkeeping bridge needed before summing the verified
 5-adic deficit chain over coprime-to-30 cores.
 -/
 
+/--
+A computable Boolean test for the upstream predicate `GoodFiberBase`.
+
+We deliberately do not write `decide (Erdos536.GoodFiberBase q)`: the
+upstream predicate is an opaque definition, so typeclass synthesis does not
+automatically unfold it to construct a `Decidable` instance.
+-/
+def goodFiberBaseBool (q : Nat) : Bool :=
+  decide (0 < q) && decide (Nat.gcd q 6 = 1)
+
+@[simp]
+theorem goodFiberBaseBool_eq_true_iff
+    (q : Nat) :
+    goodFiberBaseBool q = true ↔
+      Erdos536.GoodFiberBase q := by
+  simp [goodFiberBaseBool, Erdos536.GoodFiberBase, Nat.Coprime]
+
 /-- All good `2,3`-fiber bases up to `N`. -/
-noncomputable def GoodBaseUpToList (N : Nat) : List Nat := by
-  classical
-  exact
-    (List.range (N + 1)).filter
-      (fun q => decide (Erdos536.GoodFiberBase q))
+def GoodBaseUpToList (N : Nat) : List Nat :=
+  (List.range (N + 1)).filter goodFiberBaseBool
 
 theorem goodBaseUpToList_nodup
     (N : Nat) :
     (GoodBaseUpToList N).Nodup := by
-  classical
   unfold GoodBaseUpToList
-  exact List.nodup_range.filter
-    (fun q => decide (Erdos536.GoodFiberBase q))
+  exact List.nodup_range.filter goodFiberBaseBool
 
 theorem mem_goodBaseUpToList
     {N q : Nat} :
     q ∈ GoodBaseUpToList N ↔
       q ≤ N ∧ Erdos536.GoodFiberBase q := by
-  classical
   constructor
   · intro hq
     have hdata :
-        q < N + 1 ∧ Erdos536.GoodFiberBase q := by
+        q < N + 1 ∧ goodFiberBaseBool q = true := by
       simpa [GoodBaseUpToList] using hq
-    exact ⟨Nat.le_of_lt_succ hdata.1, hdata.2⟩
+    exact
+      ⟨Nat.le_of_lt_succ hdata.1,
+       (goodFiberBaseBool_eq_true_iff q).mp hdata.2⟩
   · intro hq
     have hlt : q < N + 1 :=
       Nat.lt_succ_of_le hq.1
-    simpa [GoodBaseUpToList, hlt, hq.2]
+    have hgood :
+        goodFiberBaseBool q = true :=
+      (goodFiberBaseBool_eq_true_iff q).mpr hq.2
+    simpa [GoodBaseUpToList, hlt, hgood]
 
 /-- Every upstream active base is one of the good bases up to `N`. -/
 theorem fiberActiveBaseList_subset_goodBaseUpToList
@@ -81,8 +97,8 @@ theorem fiberIntegerList_eq_nil_of_not_mem_baseList
 
 /--
 On any ambient list of candidate bases, filtering by "actually occurs as a
-base" or by "is a good base" gives the same total integer-fiber count.
-The extra good bases have empty fibers.
+base" or by our Boolean good-base test gives the same total integer-fiber
+count.  The extra good bases have empty fibers.
 -/
 theorem fiberInteger_sum_filter_base_eq_good
     {A : List Nat}
@@ -93,10 +109,9 @@ theorem fiberInteger_sum_filter_base_eq_good
         (fun q => decide (q ∈ Erdos536.FiberBaseList A))).map
       (fun q => (Erdos536.FiberIntegerList A q).length)).sum
     =
-    ((L.filter
-        (fun q => decide (Erdos536.GoodFiberBase q))).map
+    ((L.filter goodFiberBaseBool).map
       (fun q => (Erdos536.FiberIntegerList A q).length)).sum := by
-  classical
+
   induction L with
   | nil =>
       simp
@@ -105,13 +120,28 @@ theorem fiberInteger_sum_filter_base_eq_good
       · have hGood :
             Erdos536.GoodFiberBase q :=
           Erdos536.fiberBaseList_good_of_mem hA hBase
-        simp [hBase, hGood, ih]
+        have hGoodB :
+            goodFiberBaseBool q = true :=
+          (goodFiberBaseBool_eq_true_iff q).mpr hGood
+        simp [hBase, hGoodB, ih]
       · have hNil :
             Erdos536.FiberIntegerList A q = [] :=
           fiberIntegerList_eq_nil_of_not_mem_baseList hBase
         by_cases hGood : Erdos536.GoodFiberBase q
-        · simp [hBase, hGood, hNil, ih]
-        · simp [hBase, hGood, ih]
+        · have hGoodB :
+              goodFiberBaseBool q = true :=
+            (goodFiberBaseBool_eq_true_iff q).mpr hGood
+          simp [hBase, hGoodB, hNil, ih]
+        · have hGoodB :
+              goodFiberBaseBool q = false := by
+            cases hBool : goodFiberBaseBool q with
+            | false =>
+                exact hBool
+            | true =>
+                exfalso
+                exact hGood
+                  ((goodFiberBaseBool_eq_true_iff q).mp hBool)
+          simp [hBase, hGoodB, ih]
 
 /--
 Thus the exact upstream active-fiber sum equals the sum over every good base
@@ -126,7 +156,7 @@ theorem fiberActiveIntegerSum_eq_goodBaseIntegerSum
     =
     ((GoodBaseUpToList N).map
       (fun q => (Erdos536.FiberIntegerList A q).length)).sum := by
-  classical
+
   simpa [Erdos536.FiberActiveBaseList, GoodBaseUpToList] using
     (fiberInteger_sum_filter_base_eq_good
       (A := A) (N := N) hA (List.range (N + 1)))
@@ -183,7 +213,7 @@ theorem fiveCode_injective :
       fiveCore_mul_pow_fiveExponent r
 
 /-- Canonical factor-5 codes of all good bases up to `N`. -/
-noncomputable def GoodBaseFiveCodeList
+def GoodBaseFiveCodeList
     (N : Nat) : List (Nat × Nat) :=
   (GoodBaseUpToList N).map FiveCode
 
@@ -203,7 +233,7 @@ theorem mem_goodBaseFiveCodeList_data
     GoodThirtyCore m ∧
       FiveBase m k ≤ N ∧
       Erdos536.GoodFiberBase (FiveBase m k) := by
-  classical
+
   rw [GoodBaseFiveCodeList, List.mem_map] at h
   rcases h with ⟨q, hq, hCode⟩
 
@@ -229,7 +259,8 @@ theorem mem_goodBaseFiveCodeList_data
 
   have hmThirty :
       GoodThirtyCore m := by
-    simpa [hCore] using hCoreData
+    rw [← hCore]
+    exact hCoreData
 
   have hBound :
       FiveBase m k ≤ N := by
