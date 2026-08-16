@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build global cardinality saving
-        run: lake build Erdos536813.GlobalCardinalitySaving
+      - name: Build canonical high depth
+        run: lake build Erdos536813.CanonicalHighDepth
