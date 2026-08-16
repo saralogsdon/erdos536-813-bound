@@ -1,11 +1,11 @@
-name: Verify canonical good-base five decomposition
+name: Verify active-base five-adic regrouping
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  good-base-five-decomposition:
+  active-base-five-grouping:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build canonical good-base five decomposition
-        run: lake build Erdos536813.GoodBaseFiveDecomposition
+      - name: Build active-base five-adic regrouping
+        run: lake build Erdos536813.ActiveBaseFiveGrouping
