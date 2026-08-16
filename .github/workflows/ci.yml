@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build disjoint global core chains
-        run: lake build Erdos536813.GlobalCoreDisjoint
+      - name: Build global core sum reindexing
+        run: lake build Erdos536813.GlobalCoreReindex
