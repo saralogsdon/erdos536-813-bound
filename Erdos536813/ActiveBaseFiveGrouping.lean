@@ -136,7 +136,7 @@ theorem fiberInteger_sum_filter_base_eq_good
               goodFiberBaseBool q = false := by
             cases hBool : goodFiberBaseBool q with
             | false =>
-                exact hBool
+                rfl
             | true =>
                 exfalso
                 exact hGood
