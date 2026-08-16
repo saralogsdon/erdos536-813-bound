@@ -10,7 +10,7 @@ actual depth `k` with `m * 5^k ≤ N` into `CoreDepthFinset N m`.
 
 The verified finite/high target only uses an initial prefix of this chain.
 Because slice deficits are nonnegative, the deficit sum over that prefix is
-at most the deficit sum over the complete chain.  Summing the pointwise
+at most the deficit sum over the complete chain. Summing the pointwise
 benchmark
 
     FiberIntegerList + slice deficit ≤ L23
@@ -22,7 +22,7 @@ over the complete chain then gives the desired whole-chain target saving.
 def CoreDeficitSum
     (A : List Nat)
     (N m : Nat) : Nat :=
-  ∑ k in CoreDepthFinset N m,
+  ∑ k ∈ CoreDepthFinset N m,
     FiberSliceDeficit
       (N / m)
       (ActualFiveSlice A N m)
@@ -203,7 +203,7 @@ theorem finiteTarget_plus_coreIntegerSum_le_baseline
 
 /--
 For every high outer scale `N/m ≥ 120`, the canonical high target also
-subtracts from the complete finite 5-adic chain.  The returned `n` is the
+subtracts from the complete finite 5-adic chain. The returned `n` is the
 canonical first depth whose normalized scale lies in `24..119`.
 -/
 theorem exists_canonical_highTarget_plus_coreIntegerSum_le_baseline
