@@ -1,11 +1,11 @@
-name: Verify actual fiber deficit benchmark
+name: Verify canonical good-base five decomposition
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  actual-fiber-benchmark:
+  good-base-five-decomposition:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build actual fiber deficit benchmark
-        run: lake build Erdos536813.ActualFiberBenchmark
+      - name: Build canonical good-base five decomposition
+        run: lake build Erdos536813.GoodBaseFiveDecomposition
