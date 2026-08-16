@@ -39,11 +39,15 @@ theorem fiveCodeIntegerListSum_eq_globalFiveCodeFinsetIntegerSum
   have hSum :=
     finsetSum_eq_listMapSum_of_nodup
       (L := GoodBaseFiveCodeList N)
-      (f := FiveCodeIntegerWeight A)
+      (f := fun c =>
+        (Erdos536.FiberIntegerList A
+          (FiveBase c.1 c.2)).length)
       (goodBaseFiveCodeList_nodup N)
 
   unfold GlobalFiveCodeFinsetIntegerSum
+    FiveCodeIntegerWeight
 
+  exact hSum.symm
   simpa [FiveCodeIntegerWeight] using hSum.symm
 
 /--
