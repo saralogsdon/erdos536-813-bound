@@ -26,10 +26,9 @@ theorem globalCode_mem_some_core
     mem_goodBaseFiveCodeList_iff.mp hCode
   constructor
   · apply mem_goodCoreFinset_iff.mpr
-    have hmle :
-        have hmle : m ≤ FiveBase m k := by
-  unfold FiveBase
-  exact Nat.le_mul_of_pos_right m (by positivity)
+    have hmle : m ≤ FiveBase m k := by
+      unfold FiveBase
+      exact Nat.le_mul_of_pos_right m (by positivity)
     exact ⟨le_trans hmle hData.2, hData.1⟩
   · exact
       (mem_coreDepthFinset_iff_global_code hData.1).mpr hCode
