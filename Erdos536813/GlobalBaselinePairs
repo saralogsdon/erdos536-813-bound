@@ -1,0 +1,49 @@
+import Erdos536813.GoodBaseBaseline
+
+namespace Erdos536813
+
+/--
+For every good base `q ≤ N`, attach every point in the explicit axis
+benchmark at scale `N / q`.
+-/
+def GlobalBaselinePairs
+    (N : Nat) : List (Nat × Erdos536.GridPoint) :=
+  (GoodBaseUpToList N).flatMap
+    (fun q =>
+      (AxisBenchmarkList (N / q)).map
+        (fun p => (q, p)))
+
+/--
+The number of global baseline pairs is the sum of the individual
+`L23 (N / q)` baseline contributions.
+-/
+theorem globalBaselinePairs_length_eq_goodBaseBaselineSum
+    {N : Nat} :
+    (GlobalBaselinePairs N).length
+      =
+    ((GoodBaseUpToList N).map
+      (fun q => L23 (N / q))).sum := by
+
+  simp [
+    GlobalBaselinePairs,
+    List.length_flatMap,
+    List.length_map,
+    axisBenchmarkList_length
+  ]
+
+/--
+Consequently, the global baseline is exactly the number of global
+baseline pairs.
+-/
+theorem globalBaselinePairs_length_eq_globalCoreBaselineSum
+    {N : Nat} :
+    (GlobalBaselinePairs N).length
+      =
+    GlobalCoreBaselineSum N := by
+
+  rw [
+    globalBaselinePairs_length_eq_goodBaseBaselineSum,
+    goodBaseBaselineSum_eq_globalCoreBaselineSum
+  ]
+
+end Erdos536813
