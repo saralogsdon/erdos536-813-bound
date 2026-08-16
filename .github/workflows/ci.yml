@@ -1,11 +1,11 @@
-name: Verify exact five-code characterization
+name: Verify target prefixes are global codes
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  exact-five-code-characterization:
+  target-prefix-global:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build exact five-code characterization
-        run: lake build Erdos536813.FiveCodeCharacterization
+      - name: Build target-prefix global-code bridge
+        run: lake build Erdos536813.TargetPrefixGlobal
