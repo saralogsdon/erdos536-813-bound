@@ -1,11 +1,11 @@
-name: Verify active-base five-adic regrouping
+name: Verify safe high-scale fiber prefix
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  active-base-five-grouping:
+  safe-high-fiber-prefix:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build active-base five-adic regrouping
-        run: lake build Erdos536813.ActiveBaseFiveGrouping
+      - name: Build safe high-scale fiber prefix
+        run: lake build Erdos536813.SafeHighFiberPrefix
