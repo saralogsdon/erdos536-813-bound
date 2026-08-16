@@ -3,7 +3,7 @@ import Erdos536813.GlobalCoreDisjoint
 namespace Erdos536813
 
 /-- The actual integer-fiber contribution attached to a five-code. -/
-def FiveCodeIntegerWeight
+noncomputable def FiveCodeIntegerWeight
     (A : List Nat)
     (p : Nat × Nat) : Nat :=
   (Erdos536.FiberIntegerList A
@@ -44,7 +44,6 @@ theorem globalFiveCodeFinsetIntegerSum_eq_globalCoreIntegerSum
 
   rw [Finset.sum_image]
 
-  intro k₁ hk₁ k₂ hk₂ hEq
-  exact (Prod.mk.inj_iff.mp hEq).2
+  simp [FiveCodeIntegerWeight]
 
 end Erdos536813
