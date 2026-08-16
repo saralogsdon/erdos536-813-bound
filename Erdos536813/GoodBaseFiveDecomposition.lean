@@ -90,7 +90,7 @@ theorem fiveCore_goodThirty_of_goodFiberBase
   have hcoreDvd :
       FiveCore q ∣ q := by
     refine ⟨5 ^ FiveExponent q, ?_⟩
-    exact fiveCore_mul_pow_fiveExponent q
+    exact (fiveCore_mul_pow_fiveExponent q).symm
 
   have hcore6 :
       Nat.Coprime (FiveCore q) 6 :=
