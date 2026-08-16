@@ -54,5 +54,5 @@ jobs:
       - name: Get Mathlib cache
         run: lake exe cache get
 
-      - name: Build global combined target
-        run: lake build Erdos536813.GlobalCombinedTarget
+      - name: Build global baseline reindexing
+        run: lake build Erdos536813.GlobalBaselineReindex
