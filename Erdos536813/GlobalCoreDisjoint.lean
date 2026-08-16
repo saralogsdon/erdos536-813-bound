@@ -36,7 +36,7 @@ finset is pairwise disjoint.
 -/
 theorem goodCore_pairwise_disjoint_codeImages
     {N : Nat} :
-    (GoodCoreFinset N).toSet.Pairwise
+    (↑(GoodCoreFinset N) : Set Nat).Pairwise
       (fun m₁ m₂ =>
         Disjoint
           ((CoreDepthFinset N m₁).image
