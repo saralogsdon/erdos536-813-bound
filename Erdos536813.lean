@@ -44,3 +44,4 @@ import Erdos536813.GoodCoreQuotientDensityError
 import Erdos536813.NatDivRealApprox
 import Erdos536813.QuotientIntervalWeightApprox
 import Erdos536813.NormalizedQuotientDensityApprox
+import Erdos536813.TruncatedTargetApprox
