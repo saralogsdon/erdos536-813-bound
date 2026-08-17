@@ -28,3 +28,4 @@ import Erdos536813.FiveBlockScale
 import Erdos536813.CanonicalFiveBlock
 import Erdos536813.CombinedFiveBlockWeight
 import Erdos536813.PositiveDepthHighWeight
+import Erdos536813.GoodCoreResidues
