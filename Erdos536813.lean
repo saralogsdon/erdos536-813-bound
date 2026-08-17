@@ -46,3 +46,4 @@ import Erdos536813.QuotientIntervalWeightApprox
 import Erdos536813.NormalizedQuotientDensityApprox
 import Erdos536813.TruncatedTargetApprox
 import Erdos536813.BlockAlignedWeightLimit
+import Erdos536813.ExpandedBlockWeights
