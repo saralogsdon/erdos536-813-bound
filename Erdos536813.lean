@@ -49,3 +49,4 @@ import Erdos536813.BlockAlignedWeightLimit
 import Erdos536813.ExpandedBlockWeights
 import Erdos536813.CombinedTargetWeightReal
 import Erdos536813.FiniteTargetInterval
+import Erdos536813.HighLayerIntervals
