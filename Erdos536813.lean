@@ -24,3 +24,4 @@ import Erdos536813.GlobalBaselineValueNodup
 import Erdos536813.GlobalBaselineBound
 import Erdos536813.CombinedTargetDominatesFinite
 import Erdos536813.FiniteCombinedTargetWeight
+import Erdos536813.FiveBlockScale
