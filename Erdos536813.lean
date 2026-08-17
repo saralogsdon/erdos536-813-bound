@@ -31,3 +31,4 @@ import Erdos536813.PositiveDepthHighWeight
 import Erdos536813.GoodCoreResidues
 import Erdos536813.GoodCoreResidueBlocks
 import Erdos536813.GoodCoreBlockCharacterization
+import Erdos536813.GoodCoreInitialBlocks
