@@ -39,3 +39,4 @@ import Erdos536813.GoodCoreDensityError
 import Erdos536813.GoodCoreDensityLimit
 import Erdos536813.GoodCoreQuotientFibers
 import Erdos536813.GlobalTargetQuotientReindex
+import Erdos536813.GoodCoreQuotientCountDifference
