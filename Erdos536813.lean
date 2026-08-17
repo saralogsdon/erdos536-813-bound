@@ -42,3 +42,4 @@ import Erdos536813.GlobalTargetQuotientReindex
 import Erdos536813.GoodCoreQuotientCountDifference
 import Erdos536813.GoodCoreQuotientDensityError
 import Erdos536813.NatDivRealApprox
+import Erdos536813.QuotientIntervalWeightApprox
