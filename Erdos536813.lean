@@ -25,3 +25,4 @@ import Erdos536813.GlobalBaselineBound
 import Erdos536813.CombinedTargetDominatesFinite
 import Erdos536813.FiniteCombinedTargetWeight
 import Erdos536813.FiveBlockScale
+import Erdos536813.CanonicalFiveBlock
