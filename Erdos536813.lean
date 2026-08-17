@@ -36,3 +36,4 @@ import Erdos536813.GoodCoreInitialBlocksNodup
 import Erdos536813.GoodCoreCountLower
 import Erdos536813.GoodCoreCountUpper
 import Erdos536813.GoodCoreDensityError
+import Erdos536813.GoodCoreDensityLimit
