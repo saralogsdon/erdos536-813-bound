@@ -57,3 +57,4 @@ import Erdos536813.BlockAlignedTruncation
 import Erdos536813.TruncatedTargetDominated
 import Erdos536813.GlobalTargetBlockLower
 import Erdos536813.FixedBlockGlobalLower
+import Erdos536813.GlobalTargetAsymptoticLower
